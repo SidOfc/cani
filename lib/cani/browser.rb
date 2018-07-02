@@ -1,53 +1,26 @@
 module Cani
   class Browser
-    attr_reader :name, :title, :prefix, :type, :versions, :usage
+    attr_reader :name, :title, :prefix, :type, :versions, :usage, :abbr
+
+    ABBR_MAP = { 'ios' => 'saf.ios' }.freeze
 
     def initialize(attributes = {})
-      @name     = attributes[:name]
+      abbr = attributes['abbr'].downcase.gsub(/^\.+|\.+$/, '').tr('/', '.')
+
+      @name     = attributes[:name].downcase
+      @abbr     = ABBR_MAP.fetch abbr, abbr
       @title    = attributes['browser']
-      @prefix   = attributes['prefix']
-      @type     = attributes['type']
+      @prefix   = attributes['prefix'].downcase
+      @type     = attributes['type'].downcase
       @usage    = attributes['usage_global']
       @versions = @usage.keys
-    end
-
-    def supported_in(version)
-      features_for(version)[:supported]
-    end
-
-    def partial_in(version)
-      features_for(version)[:partial]
-    end
-
-    def unsupported_in(version)
-      features_for(version)[:unsupported]
-    end
-
-    def polyfill_in(version)
-      features_for(version)[:polyfill]
-    end
-
-    def prefix_in(version)
-      features_for(version)[:prefix]
-    end
-
-    def flag_in(version)
-      features_for(version)[:flag]
-    end
-
-    def rows_for(**opts)
-      return unless opts[:version] && opts[:columns] && opts[:types]
-
-      opts[:types].flat_map do |type|
-        next unless (fts = features_for(opts[:version])[type])
-        fts.map { |ft| opts[:columns].map { |col| ft.fetch(col, '') } }
-      end.compact
     end
 
     def features_for(version)
       @features ||= Cani.api.features.each_with_object({}) do |ft, h|
         type = ft.support_in(name, version)
-        (h[type] ||= []) << ft.browser_info(name, version)
+        (h[type] ||= []) << { support: type, title: ft.title,
+                              status: ft.status, percent: ft.percent }
       end
     end
   end

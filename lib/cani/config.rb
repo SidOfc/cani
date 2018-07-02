@@ -4,10 +4,9 @@ module Cani
 
     DEFAULTS = {
       expire: 86_400,
-      versions: 4,
+      versions: 1,
       source: 'https://raw.githubusercontent.com/Fyrd/caniuse/master/data.json',
-      show: %w[ie edge safari ios_saf opera
-               op_mob firefox chrome android bb],
+      show: %w[chrome firefox edge ie safari ios_saf opera android bb],
       default: File.expand_path('~/.config/cani/config.yml'),
       paths: [File.expand_path('~/.cani.yml'),
               File.expand_path('./.cani.yml')],
