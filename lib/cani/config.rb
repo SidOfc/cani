@@ -8,8 +8,6 @@ module Cani
       source: 'https://raw.githubusercontent.com/Fyrd/caniuse/master/data.json',
       show: %w[chrome firefox edge ie safari ios_saf opera android bb],
       default: File.expand_path('~/.config/cani/config.yml'),
-      paths: [File.expand_path('~/.cani.yml'),
-              File.expand_path('./.cani.yml')],
       aliases: { 'firefox' => 'ff', 'chrome' => 'chr', 'safari' => 'saf',
                  'ios_saf' => 'saf_ios', 'opera' => 'opr',
                  'op_mob' => 'opr_mob', 'android' => 'andr' },
@@ -24,10 +22,6 @@ module Cani
         @settings.merge! YAML.load_file(default)
       else
         create_default
-      end
-
-      paths.each do |path|
-        @settings.merge!(YAML.load_file(path)) if File.exist? path
       end
     end
 
