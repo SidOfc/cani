@@ -9,7 +9,7 @@ module Cani
 
       @name     = attributes[:name].downcase
       @abbr     = ABBR_MAP.fetch abbr, abbr
-      @title    = attributes['browser']
+      @title    = attributes['browser'].downcase
       @prefix   = attributes['prefix'].downcase
       @type     = attributes['type'].downcase
       @usage    = attributes['usage_global']

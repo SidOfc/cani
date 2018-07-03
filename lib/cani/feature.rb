@@ -39,7 +39,7 @@ module Cani
       @percent = attributes['usage_perc_y']
       @stats   = attributes['stats'].each_with_object({}) do |(k, v), h|
         h[k] = v.to_a.last(Cani.config.versions)
-                .map { |(vv, s)| [vv, s.to_s[0] || ''] }.to_h
+                .map { |(vv, s)| [vv.downcase, s.to_s[0] || ''] }.to_h
       end
     end
 
