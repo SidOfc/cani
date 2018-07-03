@@ -58,14 +58,7 @@ module Cani
     if cmd && respond_to?(cmd)
       send cmd
     else
-      cmd = fzf([['show', 'Show browser info'],
-                 ['use', 'Show feature info'],
-                 ['edit', 'Edit the default config using $EDITOR']],
-                 header: ['commands']).first
-
-      if cmd
-        run cmd
-      end
+      help
     end
   end
 
