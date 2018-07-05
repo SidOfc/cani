@@ -9,6 +9,7 @@ require 'cani/config'
 require 'cani/api'
 require 'cani/feature'
 require 'cani/browser'
+require 'cani/completer'
 
 # Cani
 module Cani
@@ -27,27 +28,23 @@ module Cani
     puts ''
     puts 'Commands:'
     puts '   use FEATURE             show browser support for FEATURE'
-    puts '   show BROWSER            show information about specific browser'
-    puts '   list TYPE               list names of each item in TYPE'
-    puts '                           TYPE can be "features" or "browsers"'
-    puts ''
-    puts 'Options:'
-    puts '   -h   --help             show this help'
-    puts '   -v   --version          print the version number'
+    puts '   show BROWSER            show information about specific BROWSER'
+    puts '   help                    show this help'
+    puts '   version                 print the version number'
     puts ''
     puts 'Examples:'
-    puts '   cani -h'
-    puts '   cani --version'
-    puts '   cani use box-shadow'
+    puts '   cani use'
     puts '   cani show ie'
-    puts '   cani list features'
+    puts '   cani show chr.and'
 
     exit
   end
 
   def self.find_browser(name)
     name = name.to_s.downcase
-    idx  = api.browsers.find_index { |bwsr| bwsr.title.downcase == name }
+    idx  = api.browsers.find_index do |bwsr|
+      [bwsr.title, bwsr.name, bwsr.abbr].include? name
+    end
 
     api.browsers[idx] if idx
   end
@@ -85,6 +82,11 @@ module Cani
         end
       end.join('   ').rstrip
     end
+  end
+
+  def self.version
+    puts Cani::VERSION
+    exit
   end
 
   def self.edit
