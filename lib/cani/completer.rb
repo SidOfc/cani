@@ -31,5 +31,24 @@ module Cani
 
       File.open(File.join(gem_root, 'shell/tmp.fish'), 'w') { |f| f << tpl + shw }
     end
+
+    def self.generate_zsh
+      gem_root  = File.join File.dirname(__FILE__), '../../'
+      tpl       = File.read File.join(gem_root, 'shell/completions/functions.zsh')
+      indent    = 10
+
+      versions  = NAMES.keys.map do |name|
+        next unless browser = Cani.find_browser(name)
+
+        [(' ' * (indent - 2)) + name + ')',
+         (' ' * indent) + "_arguments -C \"1: :(#{browser.versions.join(' ')})\"",
+         (' ' * indent) + ';;'].join("\n")
+      end.compact.join("\n").lstrip
+
+      processed = tpl.gsub('{{names}}', NAMES.keys.join(' '))
+                     .gsub('{{versions}}', versions)
+
+      File.open(File.join(gem_root, 'shell/tmp.zsh'), 'w') { |f| f << processed }
+    end
   end
 end
