@@ -26,5 +26,21 @@ module Cani
 
       File.open(File.join(gem_root, 'shell/tmp.zsh'), 'w') { |f| f << processed }
     end
+
+    def self.generate_bash
+      gem_root  = File.join File.dirname(__FILE__), '../../'
+      tpl       = File.read File.join(gem_root, 'shell/completions/functions.bash')
+      indent    = 10
+      versions  = Cani.api.browsers.reduce(String.new) do |acc, browser|
+        acc + (' ' * (indent - 2)) + '"' + browser.abbr + "\")\n" +
+        (' ' * indent) + "COMPREPLY=($(compgen -W \"#{browser.versions.join(' ')}\" ${COMP_WORDS[COMP_CWORD]}))\n" +
+        (' ' * indent) + ";;\n"
+      end.strip
+
+      processed = tpl.gsub('{{names}}', Cani.api.browsers.map(&:abbr).join(' '))
+                     .gsub('{{versions}}', versions)
+
+      File.open(File.join(gem_root, 'shell/tmp.bash'), 'w') { |f| f << processed }
+    end
   end
 end

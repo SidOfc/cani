@@ -5,7 +5,7 @@
 # Unlike the functions.fish file, this one cannot be run directly.
 #
 # The invalid syntax will be replaced with valid ZSH code
-# during the installation.
+# during the installation process.
 
 function _cani {
   local line
