@@ -39,17 +39,17 @@ module Cani
         @spec    = attributes['spec']
         @percent = attributes['usage_perc_y']
         @stats   = attributes['stats'].each_with_object({}) do |(k, v), h|
-          h[k] = v.to_a.last(Cani.config.versions)
+          h[k] = v.to_a.last(Cani.api.config.versions)
                   .map { |(vv, s)| [vv.downcase, s.to_s[0] || ''] }.to_h
         end
       end
 
       def current_support
-        @current_support ||= Cani.config.show.map do |browser|
+        @current_support ||= Cani.api.config.show.map do |browser|
           bridx = Cani.api.browsers.find_index { |brs| brs.name == browser }
           brwsr = Cani.api.browsers[bridx] unless bridx.nil?
           syms  = stats[browser].values.map { |s| SYMBOLS[s] || '' }
-                                .join.rjust(Cani.config.versions)
+                                .join.rjust(Cani.api.config.versions)
 
           syms + brwsr.abbr
         end

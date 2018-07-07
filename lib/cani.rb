@@ -5,16 +5,12 @@ require 'json'
 require 'yaml'
 
 require 'cani/version'
-require 'cani/config'
 require 'cani/api'
+require 'cani/fzf'
 require 'cani/completions'
 
 # Cani
 module Cani
-  def self.config(**opts)
-    @settings ||= Config.new(**opts)
-  end
-
   def self.api
     @api ||= Api.new
   end

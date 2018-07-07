@@ -41,7 +41,7 @@ module Cani
 
     def self.install!
       fish_dir = File.expand_path('~/.config/fish/completions')
-      def_dir  = File.join File.dirname(Cani.config.default), 'completions'
+      def_dir  = File.join File.dirname(Cani.api.config.default), 'completions'
 
       # create all parent folders
       FileUtils.mkdir_p fish_dir
@@ -64,7 +64,7 @@ module Cani
 
     def self.remove!
       fish_dir  = File.expand_path '~/.config/fish/completions'
-      def_dir   = File.join File.dirname(Cani.config.default), 'completions'
+      def_dir   = File.join File.dirname(Cani.api.config.default), 'completions'
       fish_comp = File.join fish_dir, 'cani.fish'
 
       File.unlink fish_comp if File.exist? fish_comp
@@ -80,7 +80,7 @@ module Cani
     end
 
     def self.delete_source_lines!
-      comp_dir = File.join File.dirname(Cani.config.default), 'completions'
+      comp_dir = File.join File.dirname(Cani.api.config.default), 'completions'
       %w[bash zsh].each do |shell|
         shellrc   = File.join(Dir.home, ".#{shell}rc")
         lines     = File.read(shellrc).split("\n")
@@ -93,7 +93,7 @@ module Cani
     end
 
     def self.insert_source_lines!
-      comp_dir = File.join File.dirname(Cani.config.default), 'completions'
+      comp_dir = File.join File.dirname(Cani.api.config.default), 'completions'
       %w[bash zsh].each do |shell|
         shellrc   = File.join(Dir.home, ".#{shell}rc")
         lines     = File.read(shellrc).split("\n")
