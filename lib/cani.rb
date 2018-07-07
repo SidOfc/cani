@@ -9,7 +9,7 @@ require 'cani/config'
 require 'cani/api'
 require 'cani/feature'
 require 'cani/browser'
-require 'cani/completer'
+require 'cani/completions'
 
 # Cani
 module Cani

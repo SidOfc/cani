@@ -1,5 +1,3 @@
-#compdef _cani cani
-
 # This is a template file that adds the most basic top level completions.
 # It is used during installation of completions via the CLI.
 # Unlike the functions.fish file, this one cannot be run directly.
@@ -25,3 +23,4 @@ function _cani {
   esac
 }
 
+compdef _cani cani
