@@ -4,4 +4,10 @@
 require 'bundler/setup'
 require 'cani'
 
-Cani.run
+cmd ||= Cani.api.config.args.first
+
+if cmd && Cani.respond_to?(cmd)
+  Cani.send cmd
+else
+  help
+end

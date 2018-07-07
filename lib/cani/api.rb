@@ -1,5 +1,6 @@
 require 'net/http'
 
+require_relative 'api/config'
 require_relative 'api/browser'
 require_relative 'api/feature'
 
@@ -7,7 +8,7 @@ module Cani
   class Api
     def initialize
       @data = begin
-        load_file = File.join File.dirname(Cani.config.default), 'caniuse.json'
+        load_file = File.join File.dirname(config.default), 'caniuse.json'
         if File.exist? load_file
           JSON.parse File.read(load_file)
         else
@@ -17,6 +18,10 @@ module Cani
           JSON.parse data
         end
       end
+    end
+
+    def config(**opts)
+      @settings ||= Config.new(**opts)
     end
 
     def find_browser(name)
@@ -39,7 +44,7 @@ module Cani
     end
 
     def raw
-      Net::HTTP.get URI(Cani.config.source)
+      Net::HTTP.get URI(config.source)
     end
   end
 end
