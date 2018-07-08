@@ -72,6 +72,8 @@ cani show
 
 Show a list of browsers. Selecting a browser will take you to the versions for that browser.
 Selecting a version shows the final window with feature support for that specific browser version.
+Navigating to the previous window is possible by pressing <kbd>escape</kbd>, this will move you up one level.
+When <kbd>escape</kbd> is pressed at the browser selection menu, the command will exit.
 
 This command can also be invoked directly with a browser and version:
 
