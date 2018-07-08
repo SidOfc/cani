@@ -33,11 +33,11 @@ module Cani
   end
 
   def self.version
-    puts Cani::VERSION
+    puts VERSION
   end
 
   def self.update
-    Cani.api.update! && Completions.install! || exit(1)
+    api.update! && Completions.install! || exit(1) unless api.updated?
   end
 
   def self.edit

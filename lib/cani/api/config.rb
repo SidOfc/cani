@@ -83,8 +83,8 @@ module Cani
           f << "# documentation: https://github.com/sidofc/cani\n"
           f << "# rubygems: https://rubygems.org/gems/cani\n\n"
           f << "# the \"expire\" key defines the interval at which new data is\n"
-          f << "# fetched from \"source\". It's value is passed in as seconds.\n"
-          f << "# #{DEFAULTS['expire']} seconds => #{tstr} by default.\n"
+          f << "# fetched from \"source\". It's value is passed in as seconds\n"
+          f << "# default value: #{DEFAULTS['expire']} # => #{tstr}\n"
           f << "expire: #{expire}\n\n"
           f << "# the \"source\" key is used to fetch the data required for\n"
           f << "# this command to work.\n"
@@ -95,9 +95,9 @@ module Cani
           f << "# the \"browsers\" key defines which browsers are shown\n"
           f << "# in the \"use\" command\n"
           f << "browsers:\n"
-          f << "  # shown:\n"
+          f << "  # enabled:\n"
           f << browsers.map { |bn| "  - #{bn}" }.join("\n") + "\n"
-          f << "  # hidden:\n"
+          f << "  # others:\n"
           f << (Cani.api.browsers.map(&:name) - browsers).map { |bn| "  # - #{bn}" }.join("\n")
         end
       end
