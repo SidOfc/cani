@@ -9,5 +9,5 @@ cmd ||= Cani.api.config.args.first
 if cmd && Cani.respond_to?(cmd)
   Cani.send cmd
 else
-  help
+  Cani.help
 end
