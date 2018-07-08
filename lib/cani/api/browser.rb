@@ -26,7 +26,7 @@ module Cani
       }.freeze
 
       def initialize(attributes = {})
-        abbr = attributes['abbr'].downcase.gsub(/^\.+|\.+$/, '').tr('/', '.')
+        abbr = attributes['abbr'].downcase.gsub(/^\.+|\.+$/, '').tr '/', '.'
 
         @abbr     = ABBR_MAP.fetch abbr, abbr
         @label    = LABEL_MAP.fetch abbr, abbr
@@ -40,7 +40,7 @@ module Cani
 
       def features_for(version)
         @features ||= Cani.api.features.each_with_object({}) do |ft, h|
-          type = ft.support_in(name, version)
+          type = ft.support_in name, version
           (h[type] ||= []) << { support: type, title: ft.title,
                                 status: ft.status, percent: ft.percent }
         end

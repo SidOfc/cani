@@ -36,8 +36,12 @@ module Cani
     puts Cani::VERSION
   end
 
+  def self.update
+    Cani.api.update! && Completions.install! || exit(1)
+  end
+
   def self.edit
-    system ENV.fetch('EDITOR', 'vim'), api.config.default
+    system ENV.fetch('EDITOR', 'vim'), api.config.file
   end
 
   def self.use
