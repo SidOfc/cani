@@ -1,6 +1,11 @@
 module Cani
   module Fzf
     def self.pick(rows, **opts)
+      unless executable?
+        puts 'fatal: command "fzf" not found, is it installed?'
+        exit 1
+      end
+
       if STDOUT.tty?
         rows   = tableize_rows(rows, **opts).join "\n"
         ohdr   = opts.fetch :header, []
@@ -13,6 +18,13 @@ module Cani
         # print results and exit this command.
         puts tableize_rows(rows).join "\n"
         exit
+      end
+    end
+
+    def self.executable?
+      @exe ||= begin
+        `command -v fzf`
+        $?.success?
       end
     end
 
