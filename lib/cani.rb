@@ -37,7 +37,7 @@ module Cani
   end
 
   def self.edit
-    system ENV.fetch('EDITOR', 'vim'), api.config.default
+    system ENV.fetch('EDITOR', 'vim'), api.config.file
   end
 
   def self.use

@@ -60,14 +60,12 @@ module Cani
     end
 
     def self.remove!
-      fish_dir  = File.expand_path '~/.config/fish/completions'
-      def_dir   = File.join File.dirname(Cani.api.config.default), 'completions'
-      fish_comp = File.join fish_dir, 'cani.fish'
+      fish_comp = File.join Cani.api.config.fish_comp_dir, 'cani.fish'
 
       File.unlink fish_comp if File.exist? fish_comp
 
       %w[bash zsh].each do |shell|
-        shell_comp = File.join def_dir, "_cani.#{shell}"
+        shell_comp = File.join Cani.api.config.comp_dir, "_cani.#{shell}"
 
         File.unlink shell_comp if File.exist? shell_comp
       end
@@ -77,11 +75,10 @@ module Cani
     end
 
     def self.delete_source_lines!
-      comp_dir = File.join File.dirname(Cani.api.config.default), 'completions'
       %w[bash zsh].each do |shell|
-        comp_path = File.join(comp_dir, "_cani.#{shell}")
         shellrc   = File.join Dir.home, ".#{shell}rc"
         lines     = File.read(shellrc).split "\n"
+        comp_path = File.join Cani.api.config.comp_dir, "_cani.#{shell}"
         rm_idx    = lines.find_index { |l| l.match? comp_path }
 
         lines.delete_at rm_idx unless rm_idx.nil?
@@ -90,11 +87,10 @@ module Cani
     end
 
     def self.insert_source_lines!
-      comp_dir = File.join File.dirname(Cani.api.config.default), 'completions'
       %w[bash zsh].each do |shell|
-        comp_path = File.join(comp_dir, "_cani.#{shell}")
         shellrc   = File.join Dir.home, ".#{shell}rc"
         lines     = File.read(shellrc).split "\n"
+        comp_path = File.join Cani.api.config.comp_dir, "_cani.#{shell}"
         slidx     = lines.find_index { |l| l.match? comp_path }
 
         if slidx

@@ -8,7 +8,7 @@ module Cani
   class Api
     def initialize
       @data = begin
-        load_file = File.join File.dirname(config.default), 'caniuse.json'
+        load_file = File.join config.directory, 'caniuse.json'
         if File.exist? load_file
           JSON.parse File.read(load_file)
         else
