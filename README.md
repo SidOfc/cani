@@ -5,7 +5,7 @@
 Cani is a small command-line wrapper around the data of [caniuse](https://caniuse.com).
 It uses [fzf](https://github.com/junegunn/fzf) to display results.
 This wrapper aims to be easy to use out of the box. To achieve this it ships with completions
-for `bash`, `fish`, and `zsh` by default. Caniuse data is fetched and updated automatically
+for `bash`, `fish`, and `zsh`. [Caniuse data (1.7MB)](https://github.com/Fyrd/caniuse/blob/master/data.json) is fetched and updated automatically
 on a regular interval together with completions.
 
 ## Installation
@@ -40,6 +40,7 @@ Some existing files will also be modified:
 - `~/.zshrc` - A source line to zsh completions will be added, or updated if it exists
 
 After running the command for the first time, please restart your shell or `source` your `~/.*rc` file to load completions.
+There are some commented settings that can be adjusted in the `~/.config/cani/config.yml` file.
 
 ## Usage
 

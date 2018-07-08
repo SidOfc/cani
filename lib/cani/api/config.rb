@@ -95,6 +95,7 @@ module Cani
           f << "source: #{source}\n\n"
           f << "# the \"versions\" key defines how many versions of support\n"
           f << "# will be shown in the \"use\" command\n"
+          f << "# e.g. `-ie +edge` becomes `--ie ++edge` when this is set to 2, etc..."
           f << "versions: #{versions}\n\n"
           f << "# the \"browsers\" key defines which browsers are shown\n"
           f << "# in the \"use\" command\n"
