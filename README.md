@@ -129,6 +129,42 @@ Purges all files created by this command, removing every trace except the execut
 It will also remove source lines added that pointed to the completions in `~/.zshrc` and `~/.bashrc`.
 After running a `purge`, all that remains is running `gem uninstall cani` to completely purge it.
 
+## Pipe output
+
+Last but not least, all `cani` commands can be piped. This will skip running `fzf` and print uncolored output.
+
+**use**
+```sh
+cani use | cat | head -3
+[rc]   97.11%   PNG alpha transparency       +chr   +ff   +edge   +ie   +saf   +saf.ios   +op   +and   +bb
+[un]   75.85%   Animated PNG (APNG)          +chr   +ff   -edge   -ie   +saf   +saf.ios   +op   -and   -bb
+[ls]   94.32%   Video element                +chr   +ff   +edge   +ie   +saf   +saf.ios   +op   +and   +bb
+```
+
+**show**
+```sh
+cani show | cat | head -3
+ie                       usage: 3.1899%
+edge                     usage: 1.8262%
+firefox                  usage: 5.0480%
+```
+
+**show BROWSER**
+```sh
+cani show firefox | cat | head -3
+63    usage: 0.0000%
+62    usage: 0.0131%
+61    usage: 0.2184%
+```
+
+**show BROWSER VERSION**
+```sh
+cani show firefox 63 | cat | head -3
+[rc]   [+]   PNG alpha transparency
+[un]   [+]   Animated PNG (APNG)
+[ls]   [+]   Video element
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/sidofc/cani. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
