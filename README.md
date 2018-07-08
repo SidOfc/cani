@@ -1,9 +1,12 @@
 # Cani
 
+![cani cli](/assets/cani.png)
+
 Cani is a small command-line wrapper around the data of [caniuse](https://caniuse.com).
 It uses [fzf](https://github.com/junegunn/fzf) to display results.
-
-![cani cli](/assets/cani.png)
+This wrapper aims to be easy to use out of the box. To achieve this it ships with completions
+for `bash`, `fish`, and `zsh` by default. Caniuse data is fetched and updated automatically
+on a regular interval together with completions.
 
 ## Installation
 
@@ -21,13 +24,29 @@ Or install it yourself as:
 
     $ gem install cani
 
+## Configuration
+
+After installation, running the command (`cani`) for the first time will create some files and directories:
+
+- `~/.config/cani/config.yml` - default configuration
+- `~/.config/cani/caniuse.json` - caniuse api data
+- `~/.config/cani/completions/_cani.bash` - bash completion
+- `~/.config/cani/completions/_cani.zsh` - zsh completion
+- `~/.config/fish/completions/cani.fish` - fish completions
+
+Some existing files will also be modified:
+
+- `~/.bashrc` - A source line to bash completions will be added, or updated if it exists
+- `~/.zshrc` - A source line to zsh completions will be added, or updated if it exists
+
+After running the command for the first time, please restart your shell or `source` your `~/.*rc` file to load completions.
+
 ## Usage
 
-After installing, the `cani` executable will be available to you.
 Running `cani` without arguments yields the help description.
 Cani supports the following actions:
 
-- [`use`](#use) - show browser support for a feature
+- [`use`](#use) - show browser support for all features
 - [`show BROWSER VERSION`](#show) - show feature support based on selected browser / version
 - [`help`](#help) - show help
 - [`version`](#version) - print the version number
@@ -104,7 +123,8 @@ cani purge
 ```
 
 Purges all files created by this command, removing every trace except the executable itself.
-That needs to be uninstalled using `gem uninstall cani`.
+It will also remove source lines added that pointed to the completions in `~/.zshrc` and `~/.bashrc`.
+After running a `purge`, all that remains is running `gem uninstall cani` to completely purge it.
 
 ## Contributing
 
