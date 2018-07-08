@@ -39,6 +39,12 @@ module Cani
       end
     end
 
+    def remove!
+      data_file = File.join config.directory, 'caniuse.json'
+
+      File.unlink data_file if File.exist? data_file
+    end
+
     def update!
       @data = load_data fetch: true
     end

@@ -18,11 +18,16 @@ module Cani
   def self.help
     puts "Cani #{VERSION} <https://github.com/SidOfc/cani>"
     puts ''
-    puts 'Usage: cani [COMMAND [ARGUMENTS]] [OPTIONS]'
+    puts 'Usage: cani [COMMAND [ARGUMENTS]]'
     puts ''
     puts 'Commands:'
     puts '   use FEATURE             show browser support for FEATURE'
     puts '   show BROWSER            show information about specific BROWSER'
+    puts '   install_completions     installs completions for bash, zsh and fish'
+    puts '   update                  force update api data and completions'
+    puts '   purge                   remove all completion, configuration and data'
+    puts '                           stored by this cani'
+    puts '   '
     puts '   help                    show this help'
     puts '   version                 print the version number'
     puts ''
@@ -34,6 +39,16 @@ module Cani
 
   def self.version
     puts VERSION
+  end
+
+  def self.install_completions
+    Completions.install!
+  end
+
+  def self.purge
+    Completions.remove!
+    api.remove!
+    api.config.remove!
   end
 
   def self.update

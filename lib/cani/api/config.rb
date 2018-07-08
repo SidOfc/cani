@@ -22,9 +22,11 @@ module Cani
         @settings = DEFAULTS.merge opts
 
         if File.exist? file
-          @settings.merge! YAML.load_file(file)
+          if (yml = YAML.load_file(file))
+            @settings.merge! yml
+          end
         else
-          create!
+          install!
         end
       end
 
@@ -58,6 +60,7 @@ module Cani
 
       def remove!
         File.unlink file if File.exist? file
+        FileUtils.rm_rf directory if Dir.exist? directory
       end
 
       def install!
@@ -77,6 +80,7 @@ module Cani
 
         FileUtils.mkdir_p directory
         File.open file, 'w' do |f|
+          f << "---\n"
           f << "# this is the default configuration file for the \"Cani\" RubyGem.\n"
           f << "# it contains some options to control what is shown, when new data\n"
           f << "# is fetched, where it should be fetched from.\n"
@@ -100,6 +104,8 @@ module Cani
           f << "  # others:\n"
           f << (Cani.api.browsers.map(&:name) - browsers).map { |bn| "  # - #{bn}" }.join("\n")
         end
+
+        Completions.install!
       end
 
       def method_missing(mtd, *args, &block)
