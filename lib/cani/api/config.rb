@@ -61,6 +61,20 @@ module Cani
       end
 
       def install!
+        hrs  = (DEFAULTS['expire'] / 3600.to_f).round 2
+        days = (hrs / 24.to_f).round 2
+        wk   = (days / 7.to_f).round 2
+        mo   = (days / 30.to_f).round 2
+        tstr = if mo >= 1
+                 "#{mo == mo.to_i ? mo.to_i : mo} month#{mo != 1 ? 's' : ''}"
+               elsif wk >= 1
+                 "#{wk == wk.to_i ? wk.to_i : wk} week#{wk != 1 ? 's' : ''}"
+               elsif days >= 1
+                 "#{days == days.to_i ? days.to_i : days} day#{days != 1 ? 's' : ''}"
+               else
+                 "#{hrs == hrs.to_i ? hrs.to_i : hrs} hour#{hrs != 1 ? 's' : ''}"
+               end
+
         FileUtils.mkdir_p directory
         File.open file, 'w' do |f|
           f << "# this is the default configuration file for the \"Cani\" RubyGem.\n"
@@ -70,7 +84,7 @@ module Cani
           f << "# rubygems: https://rubygems.org/gems/cani\n\n"
           f << "# the \"expire\" key defines the interval at which new data is\n"
           f << "# fetched from \"source\". It's value is passed in as seconds.\n"
-          f << "# 86400 seconds => 24 hours so by default, new data will be fetched every day\n"
+          f << "# #{DEFAULTS['expire']} seconds => #{tstr} by default.\n"
           f << "expire: #{expire}\n\n"
           f << "# the \"source\" key is used to fetch the data required for\n"
           f << "# this command to work.\n"
