@@ -31,7 +31,7 @@ module Cani
       end
 
       def current_support
-        @current_support ||= Cani.api.config.show.map do |browser|
+        @current_support ||= Cani.api.config.browsers.map do |browser|
           bridx = Cani.api.browsers.find_index { |brs| brs.name == browser }
           brwsr = Cani.api.browsers[bridx] unless bridx.nil?
           syms  = stats[browser].values.map { |s| TYPES[s][:symbol] || '' }

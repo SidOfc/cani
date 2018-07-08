@@ -9,10 +9,13 @@ module Cani
       FISH_DIR      = File.join(Dir.home, '.config', 'fish').freeze
       FISH_COMP_DIR = File.join(FISH_DIR, 'completions').freeze
       DEFAULTS      = {
+        # data settings
         'expire'   => 86_400,
-        'versions' => 1,
         'source'   => 'https://raw.githubusercontent.com/Fyrd/caniuse/master/data.json',
-        'show'     => %w[chrome firefox edge ie safari ios_saf opera android bb]
+
+        # usage settings
+        'versions' => 1,
+        'browsers' => %w[chrome firefox edge ie safari ios_saf opera android bb]
       }.freeze
 
       def initialize(**opts)
@@ -64,8 +67,24 @@ module Cani
           f << "# it contains some options to control what is shown, when new data\n"
           f << "# is fetched, where it should be fetched from.\n"
           f << "# documentation: https://github.com/sidofc/cani\n"
-          f << "# rubygems: https://rubygems.org/gems/cani\n"
-          f << YAML.dump(settings) + "\n"
+          f << "# rubygems: https://rubygems.org/gems/cani\n\n"
+          f << "# the \"expire\" key defines the interval at which new data is\n"
+          f << "# fetched from \"source\". It's value is passed in as seconds.\n"
+          f << "# 86400 seconds => 24 hours so by default, new data will be fetched every day\n"
+          f << "expire: #{expire}\n\n"
+          f << "# the \"source\" key is used to fetch the data required for\n"
+          f << "# this command to work.\n"
+          f << "source: #{source}\n\n"
+          f << "# the \"versions\" key defines how many versions of support\n"
+          f << "# will be shown in the \"use\" command\n"
+          f << "versions: #{versions}\n\n"
+          f << "# the \"browsers\" key defines which browsers are shown\n"
+          f << "# in the \"use\" command\n"
+          f << "browsers:\n"
+          f << "  # shown:\n"
+          f << browsers.map { |bn| "  - #{bn}" }.join("\n") + "\n"
+          f << "  # hidden:\n"
+          f << (Cani.api.browsers.map(&:name) - browsers).map { |bn| "  # - #{bn}" }.join("\n")
         end
       end
 
