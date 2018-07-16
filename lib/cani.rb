@@ -35,6 +35,15 @@ module Cani
     puts '   cani use'
     puts '   cani show ie'
     puts '   cani show chr.and'
+    puts ''
+    puts 'Statuses:'
+    puts '   [ls]   WHATWG Living Standard'
+    puts '   [rc]   W3C Recommendation'
+    puts '   [pr]   W3C Proposed Recommendation'
+    puts '   [cr]   W3C Candidate Recommendation'
+    puts '   [wd]   W3C Working Draft'
+    puts '   [ot]   Non-W3C, but reputable'
+    puts '   [un]   Unofficial, Editor\'s draft or W3C "Note"'
   end
 
   def self.version
