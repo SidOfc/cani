@@ -37,3 +37,7 @@ complete -f -c cani -n '__fish_cani_needs_command' -a 'use' -d 'Display an overv
 complete -f -c cani -n '__fish_cani_needs_command' -a 'show' -d 'Display feature support for a specific browser'
 complete -f -c cani -n '__fish_cani_needs_command' -a 'help' -d 'Show command help'
 complete -f -c cani -n '__fish_cani_needs_command' -a 'version' -d 'Print the version number'
+complete -f -c cani -n '__fish_cani_needs_command' -a 'update' -d 'force update api data and completions'
+complete -f -c cani -n '__fish_cani_needs_command' -a 'purge' -d 'remove all completion, configuration files and data stored by this cani'
+complete -f -c cani -n '__fish_cani_needs_command' -a 'install_completions' -d 'install completions for bash, zsh and fish'
+# update purge install_completions
