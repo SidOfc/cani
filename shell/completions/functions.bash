@@ -16,7 +16,7 @@ _cani_completions() {
       esac
       ;;
     *)
-      COMPREPLY=($(compgen -W "use show help version" "${COMP_WORDS[COMP_CWORD]}"))
+      COMPREPLY=($(compgen -W "use show help version update purge install_completions" "${COMP_WORDS[COMP_CWORD]}"))
       ;;
   esac
 }
