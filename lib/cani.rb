@@ -69,9 +69,9 @@ module Cani
   end
 
   def self.use
-    puts Fzf.pick Fzf.feature_rows,
-                  header: 'use]   [' + Api::Feature.support_legend,
-                  colors: %i[green light_black light_white light_black]
+    Fzf.pick Fzf.feature_rows,
+             header: 'use]   [' + Api::Feature.support_legend,
+             colors: %i[green light_black light_white light_black]
   end
 
   def self.show(brws = api.config.args[1], version = api.config.args[2])
