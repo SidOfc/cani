@@ -57,10 +57,19 @@ module Cani
       @settings ||= Config.new(**opts)
     end
 
+    def find_feature(name)
+      name = name.to_s.downcase
+      idx  = features.find_index do |ft|
+        ft.title.downcase.include?(name) || ft.name.downcase.include?(name)
+      end
+
+      features[idx] if idx
+    end
+
     def find_browser(name)
       name = name.to_s.downcase
       idx  = browsers.find_index do |bwsr|
-        [bwsr.title, bwsr.name, bwsr.abbr].include? name
+        [bwsr.title, bwsr.name, bwsr.abbr].map(&:downcase).include? name
       end
 
       browsers[idx] if idx
@@ -73,7 +82,7 @@ module Cani
     end
 
     def features
-      @features ||= @data['data'].values.map(&Feature.method(:new))
+      @features ||= @data['data'].map { |(name, info)| Feature.new info.merge(name: name) }
     end
 
     def raw

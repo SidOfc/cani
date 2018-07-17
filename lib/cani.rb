@@ -105,25 +105,29 @@ module Cani
   end
 
   def self.use
-    Fzf.pick Fzf.feature_rows,
-             header: 'use]   [' + Api::Feature.support_legend,
-             colors: %i[green light_black light_white light_black]
+    if (chosen = Fzf.pick(Fzf.feature_rows,
+                          header: 'use]   [' + Api::Feature.support_legend,
+                          colors: %i[green light_black light_white light_black]))
+
+      view chosen[2] if chosen.any?
+    end
   end
 
-  def self.view
+  def self.view(feature = Cani.api.config.args[1])
     Curses.init_screen
     Curses.curs_set 0
     Curses.noecho
+    Curses.cbreak
     Curses.start_color if Curses.has_colors?
 
     COLOR_MAP.each_with_index do |arr, i|
       Curses.init_pair arr[0], *arr[1]
     end
 
-    ft        = api.features.select { |ft| ft.percent <= 40 }.sample
-    browsers  = api.browsers.first 5
-    cwidth    = 18
-    table_len = cwidth * 5 + 4
+    ft        = api.find_feature feature
+    browsers  = (api.browsers.map(&:name) & api.config.browsers).map(&api.method(:find_browser))
+    cwidth    = 14
+    table_len = cwidth * browsers.size + browsers.size - 1
     psen      = 'global support: '
     perc      = format '%.2f%%', ft.percent
     scol      = ft.status == 'un' ? 201 : (ft.status == 'ot' ? 133 : 69)
@@ -186,6 +190,7 @@ module Cani
     Curses.getch
   ensure
     Curses.close_screen
+    use
   end
 
   def self.show(brws = api.config.args[1], version = api.config.args[2])
