@@ -118,6 +118,7 @@ module Cani
     Curses.curs_set 0
     Curses.noecho
     Curses.cbreak
+    Curses.use_default_colors
     Curses.start_color if Curses.has_colors?
 
     COLOR_MAP.each_with_index do |arr, i|
@@ -165,13 +166,9 @@ module Cani
         clr = BG_SUPP_MAP[ft.support_in(browser.name, era)] || Curses.color_pair(253)
         y_offset = y_init + (current_era < era_idx ? y : (current_era == era_idx ? y + 2 : y + 4))
         Curses.setpos y_offset, x_offset
-        if browser.usage[era].to_i >= 0.5 || current_era >= era_idx
+        if browser.usage[era].to_i >= 0.5 || (!era.empty? && current_era >= era_idx)
           Curses.attron clr do
             Curses.addstr era.center(cwidth)
-          end
-        else
-          Curses.attron Curses.color_pair(253) do
-            Curses.addstr (' ' * cwidth)
           end
         end
 
