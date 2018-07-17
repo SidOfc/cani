@@ -34,7 +34,8 @@ module Cani
         @current_support ||= Cani.api.config.browsers.map do |browser|
           bridx = Cani.api.browsers.find_index { |brs| brs.name == browser }
           brwsr = Cani.api.browsers[bridx] unless bridx.nil?
-          syms  = stats[browser].values.compact.last(Cani.api.config.versions).map { |s| TYPES[s][:symbol] || '' }
+          syms  = stats[browser].values.compact.last(Cani.api.config.versions)
+                                .map { |s| TYPES[s][:symbol] || '' }
                                 .join.rjust Cani.api.config.versions
 
           syms + brwsr.abbr
