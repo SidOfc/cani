@@ -15,7 +15,7 @@ module Cani
 
         # usage settings
         'versions' => 1,
-        'browsers' => %w[chrome firefox edge ie safari ios_saf opera android bb]
+        'browsers' => %w[ie edge chrome firefox safari ios_saf opera android bb]
       }.freeze
 
       def initialize(**opts)

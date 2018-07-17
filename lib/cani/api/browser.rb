@@ -1,7 +1,7 @@
 module Cani
   class Api
     class Browser
-      attr_reader :name, :title, :prefix, :type, :versions, :usage, :abbr, :label
+      attr_reader :name, :title, :prefix, :type, :versions, :usage, :abbr, :label, :eras
 
       ABBR_MAP  = { 'ios' => 'saf.ios' }.freeze
       LABEL_MAP = {
@@ -36,6 +36,7 @@ module Cani
         @type     = attributes['type'].downcase
         @usage    = attributes['usage_global']
         @versions = @usage.keys
+        @eras     = attributes['versions']
       end
 
       def features_for(version)

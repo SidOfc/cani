@@ -10,13 +10,13 @@ module Cani
       }.freeze
 
       TYPES = {
-        'y' => {symbol: '+', name: :default,     short: :def},
-        'a' => {symbol: '~', name: :partial,     short: :part},
-        'n' => {symbol: '-', name: :unsupported, short: :unsupp},
-        'p' => {symbol: '#', name: :polyfill,    short: :poly},
-        'x' => {symbol: '@', name: :prefix,      short: :prefix},
-        'd' => {symbol: '!', name: :flag,        short: :flag},
-        'u' => {symbol: '?', name: :unknown,     short: :unknown}
+        'y' => {symbol: '+', name: :default,     short: :def,     color: :green},
+        'a' => {symbol: '~', name: :partial,     short: :part,    color: :yellow},
+        'n' => {symbol: '-', name: :unsupported, short: :unsupp,  color: :red},
+        'p' => {symbol: '#', name: :polyfill,    short: :poly,    color: :magenta},
+        'x' => {symbol: '@', name: :prefix,      short: :prefix,  color: :magenta},
+        'd' => {symbol: '!', name: :flag,        short: :flag,    color: :magenta},
+        'u' => {symbol: '?', name: :unknown,     short: :unknown, color: :default}
       }.freeze
 
       def initialize(attributes = {})
@@ -40,8 +40,16 @@ module Cani
         end
       end
 
+      def colors(browser, version)
+        color = TYPES.fetch(stats[browser.to_s][version.to_s.downcase], {})
+                     .fetch :color, :default
+        fore  = color == :default ? :default : :black
+
+        { color: fore, background: color }
+      end
+
       def support_in(browser, version)
-        TYPES.fetch(stats[browser.to_s][version.to_s], {})
+        TYPES.fetch(stats[browser.to_s][version.to_s.downcase], {})
              .fetch :name, :unknown
       end
 
