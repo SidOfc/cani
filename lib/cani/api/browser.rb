@@ -39,7 +39,7 @@ module Cani
       end
 
       def features_for(version)
-        @features ||= Cani.api.features.each_with_object({}) do |ft, h|
+        Cani.api.features.each_with_object({}) do |ft, h|
           type = ft.support_in name, version
           (h[type] ||= []) << { support: type, title: ft.title,
                                 status: ft.status, percent: ft.percent }
