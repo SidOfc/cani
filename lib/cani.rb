@@ -128,12 +128,19 @@ module Cani
     system ENV.fetch('EDITOR', 'vim'), api.config.file
   end
 
-  def self.use
-    if (chosen = Fzf.pick(Fzf.feature_rows,
-                          header: 'use]   [' + Api::Feature.support_legend,
-                          colors: %i[green light_black light_white light_black]))
+  def self.use(chosen = Cani.api.config.args[1])
+    if chosen
+      view chosen
+    elsif (chosen = Fzf.pick(Fzf.feature_rows,
+                             header: 'use]   [' + Api::Feature.support_legend,
+                             colors: %i[green light_black light_white light_black]))
 
-      view chosen[2] if chosen.any?
+      if chosen.any?
+        # chosen[2] is the index of the title column from Fzf.feature_rows
+        view chosen[2]
+      else
+        exit
+      end
     end
   end
 
@@ -290,11 +297,11 @@ module Cani
     # Curses.addstr input.to_s
     if Curses.getch == Curses::KEY_RESIZE
       Curses.clear
-      view
+      view feature
     end
   ensure
     Curses.close_screen
-    # use
+    use nil
   end
 
   def self.show(brws = api.config.args[1], version = api.config.args[2])
