@@ -130,14 +130,14 @@ module Cani
 
   def self.use(*args)
     if (chosen = args[1])
-      view chosen
+      view '', chosen
     elsif (chosen = Fzf.pick(Fzf.feature_rows,
                              header: 'use]   [' + Api::Feature.support_legend,
                              colors: %i[green light_black light_white light_black]))
 
       if chosen.any?
         # chosen[2] is the index of the title column from Fzf.feature_rows
-        view chosen[2]
+        view '', chosen[2]
       else
         exit
       end
@@ -174,14 +174,14 @@ module Cani
 
   def self.view(*args)
     init_renderer!
-    feature,  = args
-    h, w      = IO.console.winsize
-    ft        = api.find_feature feature
-    browsers  = (api.browsers.map(&:name) & api.config.browsers).map(&api.method(:find_browser))
-    rng_size  = 6
-    cwidth    = 2 + max_col_width(browsers)
-    cwidth    = cwidth % 2 == 0 ? cwidth : cwidth + 1
-    table_len = cwidth * browsers.size + browsers.size - 1
+    _, feature, = args
+    h, w        = IO.console.winsize
+    ft          = api.find_feature feature.to_s.gsub(/\.{2,}$/, '')
+    browsers    = (api.browsers.map(&:name) & api.config.browsers).map(&api.method(:find_browser))
+    rng_size    = 6
+    cwidth      = 2 + max_col_width(browsers)
+    cwidth      = cwidth % 2 == 0 ? cwidth : cwidth + 1
+    table_len   = cwidth * browsers.size + browsers.size - 1
 
     while table_len > w
       browsers = browsers[0..-2]
@@ -320,7 +320,7 @@ module Cani
     # Curses.addstr input.to_s
     if Curses.getch == Curses::KEY_RESIZE
       Curses.clear
-      view feature
+      view '', feature
     else
       Curses.close_screen
       use
