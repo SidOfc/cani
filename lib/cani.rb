@@ -71,11 +71,27 @@ module Cani
     0..40   => Curses.color_pair(195)
   }.freeze
 
-  def self.api(*args)
+  def self.api
     @api ||= Api.new
   end
 
-  def self.help(*args)
+  def self.exec!(command, *args)
+    command = :help unless respond_to? command
+    command = command.to_s.downcase.to_sym
+
+    case command
+    when :use
+      use args[0]
+    when :show
+      show args[0], args[1]
+    when :update, :purge, :help, :version, :install_completions
+      send command
+    else
+      help
+    end
+  end
+
+  def self.help
     puts "Cani #{VERSION} <https://github.com/SidOfc/cani>"
     puts ''
     puts 'Usage: cani [COMMAND [ARGUMENTS]]'
@@ -106,38 +122,38 @@ module Cani
     puts '   [un]   Unofficial, Editor\'s draft or W3C "Note"'
   end
 
-  def self.version(*args)
+  def self.version
     puts VERSION
   end
 
-  def self.install_completions(*args)
+  def self.install_completions
     Completions.install!
   end
 
-  def self.purge(*args)
+  def self.purge
     Completions.remove!
     api.remove!
     api.config.remove!
   end
 
-  def self.update(*args)
+  def self.update
     api.update! && Completions.install! || exit(1) unless api.updated?
   end
 
-  def self.edit(*args)
+  def self.edit
     system ENV.fetch('EDITOR', 'vim'), api.config.file
   end
 
-  def self.use(*args)
-    if (chosen = args[1])
-      view '', chosen
+  def self.use(feature = nil)
+    if feature
+      view feature
     elsif (chosen = Fzf.pick(Fzf.feature_rows,
                              header: 'use]   [' + Api::Feature.support_legend,
                              colors: %i[green light_black light_white light_black]))
 
       if chosen.any?
         # chosen[2] is the index of the title column from Fzf.feature_rows
-        view '', chosen[2]
+        view chosen[2]
       else
         exit
       end
@@ -172,11 +188,19 @@ module Cani
     end
   end
 
-  def self.view(*args)
+  def self.view(feature = nil)
+    exit 1 unless feature
+
     init_renderer!
-    _, feature, = args
     h, w        = IO.console.winsize
     ft          = api.find_feature feature.to_s.gsub(/\.{2,}$/, '')
+
+    unless ft
+      puts "Could not find feature: \"#{feature}\""
+      Curses.close_screen
+      exit 1
+    end
+
     browsers    = (api.browsers.map(&:name) & api.config.browsers).map(&api.method(:find_browser))
     rng_size    = 6
     cwidth      = 2 + max_col_width(browsers)
@@ -320,7 +344,7 @@ module Cani
     # Curses.addstr input.to_s
     if Curses.getch == Curses::KEY_RESIZE
       Curses.clear
-      view '', feature
+      view feature
     else
       Curses.close_screen
       use
@@ -329,9 +353,8 @@ module Cani
     Curses.close_screen
   end
 
-  def self.show(*args)
-    _, brws, version, = args
-    browser           = api.find_browser brws
+  def self.show(brws = nil, version = nil)
+    browser = api.find_browser brws
 
     if browser
       if version

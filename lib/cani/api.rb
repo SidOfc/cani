@@ -58,9 +58,9 @@ module Cani
     end
 
     def find_feature(name)
-      name = name.to_s.downcase
+      name = Regexp.new name.to_s.downcase.gsub(/(\W)/, '.*')
       idx  = features.find_index do |ft|
-        ft.title.downcase.include?(name) || ft.name.downcase.include?(name)
+        ft.title.downcase.match?(name) || ft.name.downcase.match?(name)
       end
 
       features[idx] if idx
