@@ -48,6 +48,10 @@ module Cani
         @features = {}
       end
 
+      def most_popular_era_idx
+        eras.find_index usage.sort_by { |_, v| -v }.first.first
+      end
+
       def features_for(version)
         @features[version] ||= Cani.api.features.each_with_object({}) do |ft, h|
           type = ft.support_in name, version

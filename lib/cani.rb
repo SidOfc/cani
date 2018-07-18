@@ -13,25 +13,26 @@ require 'cani/completions'
 # Cani
 module Cani
   COLOR_MAP = {
-    256 => [7, 0],                                                              # white text on black bg
-    255 => [7, 7],                                                              # white
-    254 => [0, 7],                                                              # black text on white bg
-    253 => [0, 0],                                                              # black
-    70  => [7,   70],  34  => [7,   34],  28  => [7,   28],  22  => [7,   22],  # green
-    69  => [70,  0],   31  => [34,  0],   25  => [28,  0],   19  => [22,  0],   # green text only
-    39  => [7,   39],  33  => [7,   33],  27  => [7,   27],  21  => [7,   21],  # blue
-    38  => [39,  0],   32  => [33,  0],   26  => [27,  0],   20  => [21,  0],   # blue text only
-    134 => [7,   134], 128 => [7,   128], 91  => [7,   91],  45  => [7,   54],  # magenta
-    133 => [134, 0],   127 => [128, 0],   90  => [91,  0],   44  => [54,  0],   # magenta text only
-    196 => [7,   196], 160 => [7,   160], 124 => [7,   124],                    # red
-    195 => [196, 0],   159 => [160, 0],   123 => [124, 0],                      # red text only
-    208 => [7,   208], 202 => [7,   202], 214 => [7,   214],                    # orange
-    207 => [208, 0],   201 => [202, 0],   213 => [214, 0],                      # orange text only
-    228 => [0,   228], 227 => [0,   227], 226 => [0,   226], 220 => [0,   220], # yellow
-    225 => [228, 0],   224 => [227, 0],   223 => [226, 0],   222 => [220, 0]    # yellow text only
+    # colors on black background
+    69  => [70,  0], # green on black      (feature status, percentage counter)
+    213 => [214, 0], # orange on black     (percentage counter)
+    253 => [0,   0], # black on black      (unknown feature)
+    195 => [9,   0], # red on black        (percentage counter)
+    133 => [128, 0], # magenta on black    (current feature status)
+    201 => [214, 0], # orange on black     (current feature status)
+
+    # white on colored background
+    70  => [7, 70],  # white on green      (supported feature)
+    208 => [7, 214], # white on orange     (partial feature)
+    196 => [7, 9],   # white on red        (unsupported feature)
+    134 => [7, 128], # white on magenta    (polyfill / prefix / flag features)
+
+    # misc / one-off
+    254 => [238, 255], # black on light gray (browser names)
   }.freeze
 
-  BG_SUPP_MAP = {
+  BG_MAP = {
+    browser:     Curses.color_pair(254),
     default:     Curses.color_pair(70),
     partial:     Curses.color_pair(208),
     unsupported: Curses.color_pair(196),
@@ -39,6 +40,12 @@ module Cani
     prefix:      Curses.color_pair(134),
     flag:        Curses.color_pair(134),
     unknown:     Curses.color_pair(253)
+  }
+
+  STATUS_MAP = {
+    '*'  => Curses.color_pair(69),
+    'un' => Curses.color_pair(201),
+    'ot' => Curses.color_pair(133)
   }
 
   PERCENT_MAP = {
@@ -125,53 +132,90 @@ module Cani
       Curses.init_pair arr[0], *arr[1]
     end
 
-    ft        = api.find_feature feature
-    browsers  = (api.browsers.map(&:name) & api.config.browsers).map(&api.method(:find_browser))
-    cwidth    = 14
+    ft       = api.find_feature feature
+    browsers = (api.browsers.map(&:name) & api.config.browsers).map(&api.method(:find_browser))
+    rng_size = 6
+    cwidth   = 2 + browsers.reduce(0) do |num, browser|
+      num2 = [browser.name.size, browser.versions.map(&:size).max].max
+      num2 > num ? num2 : num
+    end
+
+    cwidth += 1 if cwidth % 2 != 0
+
     table_len = cwidth * browsers.size + browsers.size - 1
     psen      = 'global support: '
     perc      = format '%.2f%%', ft.percent
-    scol      = ft.status == 'un' ? 201 : (ft.status == 'ot' ? 133 : 69)
+    ptot_len  = table_len - perc.size - psen.size
+    yy        = 0
+    titlesize = (ft.title.size >= (ptot_len - 2) ? (ptot_len - 2) : ft.title.size) - 7
 
-    Curses.setpos 0, 0
-    Curses.addstr ft.title
-
-    Curses.setpos 0, ft.title.size + 1
-    Curses.attron Curses.color_pair(69) do
-      Curses.addstr "[#{ft.status}]"
-    end
-
-    Curses.setpos 0, table_len - perc.size - psen.size
+    # draw 'global support: ' string at top right
+    # before the percentage symbol
+    Curses.setpos yy, ptot_len
     Curses.addstr psen
 
-    Curses.setpos 0, table_len - perc.size
+    # draw the global support percentage at outer most top right
+    Curses.setpos yy, table_len - perc.size
     Curses.attron PERCENT_MAP.find { |k, v| k.include? ft.percent }.last do
       Curses.addstr perc
     end
 
-    browsers.each.with_index do |browser, x|
-      current, usage = browser.usage.sort_by { |_, v| -v }.first
-      era_idx        = browser.eras.find_index current
-      era_range      = (era_idx - 2)..(era_idx + 3)
-      x_offset       = x * cwidth + x
-      y_init         = 4
+    # draw feature status after the title
+    Curses.setpos yy, titlesize + 1
+    Curses.attron STATUS_MAP.fetch(ft.status, STATUS_MAP['*']) do
+      Curses.addstr "[#{ft.status}]"
+    end
 
-      Curses.setpos y_init - 2, x_offset
-      Curses.attron Curses.color_pair(254) do
+    # draw title starting at yy, if the line is too long,
+    # wrap on a new line
+    ft.title.chars.each_slice(titlesize).each do |chars|
+      Curses.setpos yy, 0
+      Curses.addstr chars.compact.join
+      yy += 1
+    end
+
+    # leave an empty line between feature meta and the table
+    yy += 1
+
+    browsers.each.with_index do |browser, x|
+      era_idx   = browser.most_popular_era_idx
+      era_range = (era_idx - (rng_size / 2.0).floor + 1)..(era_idx + (rng_size / 2.0).ceil)
+      x_offset  = x * cwidth + x
+
+      # cannot overwrite yy in this loop
+      yyy = yy
+
+      # draw browser name
+      Curses.setpos yyy, x_offset
+      Curses.attron BG_MAP[:browser] do
         Curses.addstr browser.name.center(cwidth)
       end
 
+      # leave an empty line after browser name
+      yyy += 2
+
       era_range.each.with_index do |current_era, y|
         era = browser.eras[current_era].to_s
-        clr = BG_SUPP_MAP[ft.support_in(browser.name, era)] || Curses.color_pair(253)
-        y_offset = y_init + (current_era < era_idx ? y : (current_era == era_idx ? y + 2 : y + 4))
-        Curses.setpos y_offset, x_offset
+        clr = BG_MAP[ft.support_in(browser.name, era)]
+
+        # the following line ensures that the current era has two blank lines
+        # above and below it, these are used to create a clear distinction
+        # between the _before_, _current_ and _after_ eras
+        y_offset = yyy + y + (current_era < era_idx ? 0 : (current_era == era_idx ? 2 : 4))
+
+        # draw colored box containing the version number
+        # background color is defined by BG_MAP which
+        # maps feature support to a background color
         if browser.usage[era].to_i >= 0.5 || (!era.empty? && current_era >= era_idx)
+          Curses.setpos y_offset, x_offset
           Curses.attron clr do
             Curses.addstr era.center(cwidth)
           end
         end
 
+        # create same background line before and after current index
+        # to make it "fat" e.g. indicating the current era for
+        # that specific browser
         if current_era == era_idx
           [-1, 1].each do |offset|
             Curses.setpos y_offset - offset, x_offset
@@ -183,11 +227,17 @@ module Cani
       end
     end
 
+    # 10 is the amount of era's we're showing (including current era)
+    # plus the 4 lines surrounding the current era
+    # plus the browser header line and the blank line after it
+    yy += rng_size + 6
+
+    # draw and wait for input to cancel
     Curses.refresh
     Curses.getch
   ensure
     Curses.close_screen
-    use
+    # use
   end
 
   def self.show(brws = api.config.args[1], version = api.config.args[2])
