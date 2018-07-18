@@ -11,7 +11,7 @@ cmd ||= Cani.api.config.args.first
 # refresh all completions after new data has been fetched
 Cani::Completions.install! if Cani.api.updated?
 
-if cmd && Cani.respond_to?(cmd)
+if cmd && !%w[init_renderer! view].include?(cmd) && Cani.respond_to?(cmd)
   # if the command is recognized, execute it
   Cani.send cmd
 else
