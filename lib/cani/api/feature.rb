@@ -26,7 +26,9 @@ module Cani
         @spec    = attributes['spec']
         @percent = attributes['usage_perc_y']
         @stats   = attributes['stats'].each_with_object({}) do |(k, v), h|
-          h[k] = v.map { |(vv, s)| [vv.downcase, s.to_s[0] || ''] }.to_h
+          h[k] = v.each_with_object({}) do |(vv, s), hh|
+            vv.split('-').each { |ver| hh[ver] = s[0] }
+          end
         end
       end
 

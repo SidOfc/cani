@@ -34,13 +34,22 @@ module Cani
         @title    = attributes['browser'].downcase
         @prefix   = attributes['prefix'].downcase
         @type     = attributes['type'].downcase
-        @usage    = attributes['usage_global']
+        @usage    = attributes['usage_global'].each_with_object({}) do |(v, u), h|
+          v.split('-').each { |ver| h[ver] = u }
+        end
+        @eras = attributes['versions'].each_with_object([]) do |v, a|
+          if v
+            v.split('-').each { |ver| a << ver }
+          else
+            a << v
+          end
+        end
         @versions = @usage.keys
-        @eras     = attributes['versions']
+        @features = {}
       end
 
       def features_for(version)
-        Cani.api.features.each_with_object({}) do |ft, h|
+        @features[version] ||= Cani.api.features.each_with_object({}) do |ft, h|
           type = ft.support_in name, version
           (h[type] ||= []) << { support: type, title: ft.title,
                                 status: ft.status, percent: ft.percent }
