@@ -12,11 +12,11 @@ module Cani
       TYPES = {
         'y' => {symbol: '+', name: :default,     short: :def},
         'a' => {symbol: '~', name: :partial,     short: :part},
-        'n' => {symbol: '-', name: :unsupported, short: :unsupp},
+        'n' => {symbol: '-', name: :unsupported, short: :unsup},
         'p' => {symbol: '#', name: :polyfill,    short: :poly},
-        'x' => {symbol: '@', name: :prefix,      short: :prefix},
+        'x' => {symbol: '@', name: :prefix,      short: :prfx},
         'd' => {symbol: '!', name: :flag,        short: :flag},
-        'u' => {symbol: '?', name: :unknown,     short: :unknown}
+        'u' => {symbol: '?', name: :unknown,     short: :unkn}
       }.freeze
 
       def initialize(attributes = {})

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'io/console'
 require 'curses'
 require 'colorize'
 require 'json'
@@ -136,7 +137,10 @@ module Cani
     end
   end
 
-  def self.view(feature = Cani.api.config.args[1])
+  def self.init_renderer!
+    return if @__renderer
+    @__renderer = true
+
     Curses.init_screen
     Curses.curs_set 0
     Curses.noecho
@@ -147,7 +151,10 @@ module Cani
     COLOR_MAP.each_with_index do |arr, i|
       Curses.init_pair arr[0], *arr[1]
     end
+  end
 
+  def self.view(feature = Cani.api.config.args[1])
+    init_renderer!
     ft       = api.find_feature feature
     browsers = (api.browsers.map(&:name) & api.config.browsers).map(&api.method(:find_browser))
     rng_size = 6
@@ -158,35 +165,40 @@ module Cani
 
     cwidth += 1 if cwidth % 2 != 0
 
+    h, w      = IO.console.winsize
     table_len = cwidth * browsers.size + browsers.size - 1
     psen      = 'global support: '
     perc      = format '%.2f%%', ft.percent
     ptot_len  = table_len - perc.size - psen.size
-    yy        = 0
-    titlesize = (ft.title.size >= (ptot_len - 2) ? (ptot_len - 2) : ft.title.size) - 7
+    titlesize = ft.title.size >= (ptot_len - 2) ? (ptot_len - 10) : ft.title.size
+    titlechnk = ft.title.chars.each_slice(titlesize).map { |gr| gr.compact.join }
+    hs        = browsers.size
+    txo       = hs * cwidth + hs - 1
+    yy        = ((h - (3 + (browsers.size / hs).ceil + 1) - (titlechnk.size + 1) - (rng_size + 6)) / 2.0).floor
+    lx        = ((w - table_len) / 2.0).floor
 
     # draw 'global support: ' string at top right
     # before the percentage symbol
-    Curses.setpos yy, ptot_len
+    Curses.setpos yy, lx + ptot_len
     Curses.addstr psen
 
     # draw the global support percentage at outer most top right
-    Curses.setpos yy, table_len - perc.size
+    Curses.setpos yy, lx + table_len - perc.size
     Curses.attron PERCENT_MAP.find { |k, v| k.include? ft.percent }.last do
       Curses.addstr perc
     end
 
     # draw feature status after the title
-    Curses.setpos yy, titlesize + 1
+    Curses.setpos yy, lx + titlesize + 1
     Curses.attron STATUS_MAP.fetch(ft.status, STATUS_MAP['*']) do
       Curses.addstr "[#{ft.status}]"
     end
 
     # draw title starting at yy, if the line is too long,
     # wrap on a new line
-    ft.title.chars.each_slice(titlesize).each do |chars|
-      Curses.setpos yy, 0
-      Curses.addstr chars.compact.join
+    titlechnk.each do |part|
+      Curses.setpos yy, lx
+      Curses.addstr part
       yy += 1
     end
 
@@ -196,7 +208,7 @@ module Cani
     browsers.each.with_index do |browser, x|
       era_idx   = browser.most_popular_era_idx
       era_range = (era_idx - (rng_size / 2.0).floor + 1)..(era_idx + (rng_size / 2.0).ceil)
-      x_offset  = x * cwidth + x
+      x_offset  = lx + x * cwidth + x
 
       # cannot overwrite yy in this loop
       yyy = yy
@@ -236,7 +248,7 @@ module Cani
           [-1, 1].each do |offset|
             Curses.setpos y_offset - offset, x_offset
             Curses.attron clr do
-              Curses.addstr(' ' * cwidth)
+              Curses.addstr ' ' * cwidth
             end
           end
         end
@@ -246,11 +258,40 @@ module Cani
     # 10 is the amount of era's we're showing (including current era)
     # plus the 4 lines surrounding the current era
     # plus the browser header line and the blank line after it
-    yy += rng_size + 6
+    # plus an additional blank line after the table
+    yy += rng_size + 7
+
+    Curses.setpos yy, lx
+    Curses.attron BG_MAP[:browser] do
+      Curses.addstr 'legend'.center(txo)
+    end
+
+    yy += 2
+
+    (BG_MAP.keys - [:browser]).each_slice(hs) do |supported|
+      supported.compact.each.with_index do |supp, xm|
+        Curses.setpos yy, lx + cwidth * xm + xm
+        Curses.attron FG_MAP[supp] do
+          supp_info = Api::Feature::TYPES.find { |(_, h)| h[:name] == supp }.last || TYPES['u']
+          supp_str  = "#{supp_info[:short]}(#{supp_info[:symbol]})"
+          Curses.addstr supp_str.center(cwidth)
+        end
+      end
+
+      # after printing a horizontal group of the legend
+      # increment y to the next group on a new line
+      yy += 1
+    end
 
     # draw and wait for input to cancel
     Curses.refresh
-    Curses.getch
+    # input = Curses.getch
+    # Curses.setpos yy, lx
+    # Curses.addstr input.to_s
+    if Curses.getch == Curses::KEY_RESIZE
+      Curses.clear
+      view
+    end
   ensure
     Curses.close_screen
     # use
