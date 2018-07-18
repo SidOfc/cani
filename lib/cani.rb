@@ -13,38 +13,54 @@ require 'cani/completions'
 # Cani
 module Cani
   COLOR_MAP = {
-    # colors on black background
-    69  => [70,  0], # green on black      (feature status, percentage counter)
-    213 => [214, 0], # orange on black     (percentage counter)
-    253 => [0,   0], # black on black      (unknown feature)
-    195 => [9,   0], # red on black        (percentage counter)
-    133 => [128, 0], # magenta on black    (current feature status)
-    201 => [214, 0], # orange on black     (current feature status)
+    # foreground colors
+    69  => [70,  -1], # green on default   (legend supported, feature status, percentage counter)
+    213 => [214, -1], # orange on default  (legend partial, percentage counter)
+    195 => [9,   -1], # red on default     (legend unsupported, percentage counter)
+    133 => [128, -1], # magenta on default (legend flag, current feature status)
+    12  => [75,  -1], # blue on default    (legend prefix)
+    204 => [205, -1], # pink on default    (legend polyfill)
+    99  => [8,   -1], # gray on default    (legend unknown)
 
-    # white on colored background
-    70  => [7, 70],  # white on green      (supported feature)
+
+    # background colors
+    70  => [7,  70], # white on green      (supported feature)
     208 => [7, 214], # white on orange     (partial feature)
-    196 => [7, 9],   # white on red        (unsupported feature)
-    134 => [7, 128], # white on magenta    (polyfill / prefix / flag features)
+    196 => [7,   9], # white on red        (unsupported feature)
+    134 => [7, 128], # white on magenta    (flag features)
+    11  => [7,  75], # white on blue       (prefix feature)
+    100 => [7,   8], # white on gray       (unknown features)
+    205 => [7, 205], # white on pink       (polyfill features)
 
     # misc / one-off
-    254 => [238, 255], # black on light gray (browser names)
+    254 => [238, 255], # black on light gray (browser names, legend title)
   }.freeze
+
+  FG_MAP = {
+    browser:     Curses.color_pair(254),
+    default:     Curses.color_pair(69),
+    partial:     Curses.color_pair(213),
+    prefix:      Curses.color_pair(12),
+    polyfill:    Curses.color_pair(204),
+    flag:        Curses.color_pair(133),
+    unsupported: Curses.color_pair(195),
+    unknown:     Curses.color_pair(99)
+  }
 
   BG_MAP = {
     browser:     Curses.color_pair(254),
     default:     Curses.color_pair(70),
     partial:     Curses.color_pair(208),
-    unsupported: Curses.color_pair(196),
-    polyfill:    Curses.color_pair(134),
-    prefix:      Curses.color_pair(134),
+    prefix:      Curses.color_pair(11),
+    polyfill:    Curses.color_pair(205),
     flag:        Curses.color_pair(134),
-    unknown:     Curses.color_pair(253)
+    unsupported: Curses.color_pair(196),
+    unknown:     Curses.color_pair(100)
   }
 
   STATUS_MAP = {
     '*'  => Curses.color_pair(69),
-    'un' => Curses.color_pair(201),
+    'un' => Curses.color_pair(213),
     'ot' => Curses.color_pair(133)
   }
 
