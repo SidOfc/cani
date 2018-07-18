@@ -13,7 +13,7 @@ Cani::Completions.install! if Cani.api.updated?
 
 if cmd && !%w[init_renderer! view].include?(cmd) && Cani.respond_to?(cmd)
   # if the command is recognized, execute it
-  Cani.send cmd
+  Cani.send cmd, *ARGV
 else
   # otherwise, display help message
   Cani.help

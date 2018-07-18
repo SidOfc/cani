@@ -71,11 +71,11 @@ module Cani
     0..40   => Curses.color_pair(195)
   }.freeze
 
-  def self.api
+  def self.api(*args)
     @api ||= Api.new
   end
 
-  def self.help
+  def self.help(*args)
     puts "Cani #{VERSION} <https://github.com/SidOfc/cani>"
     puts ''
     puts 'Usage: cani [COMMAND [ARGUMENTS]]'
@@ -106,30 +106,30 @@ module Cani
     puts '   [un]   Unofficial, Editor\'s draft or W3C "Note"'
   end
 
-  def self.version
+  def self.version(*args)
     puts VERSION
   end
 
-  def self.install_completions
+  def self.install_completions(*args)
     Completions.install!
   end
 
-  def self.purge
+  def self.purge(*args)
     Completions.remove!
     api.remove!
     api.config.remove!
   end
 
-  def self.update
+  def self.update(*args)
     api.update! && Completions.install! || exit(1) unless api.updated?
   end
 
-  def self.edit
+  def self.edit(*args)
     system ENV.fetch('EDITOR', 'vim'), api.config.file
   end
 
-  def self.use(chosen = Cani.api.config.args[1])
-    if chosen
+  def self.use(*args)
+    if (chosen = args[1])
       view chosen
     elsif (chosen = Fzf.pick(Fzf.feature_rows,
                              header: 'use]   [' + Api::Feature.support_legend,
@@ -158,26 +158,43 @@ module Cani
     COLOR_MAP.each_with_index do |arr, i|
       Curses.init_pair arr[0], *arr[1]
     end
+
+    trap "INT" do
+      Curses.close_screen
+      use
+    end
   end
 
-  def self.view(feature = Cani.api.config.args[1])
-    init_renderer!
-    ft       = api.find_feature feature
-    browsers = (api.browsers.map(&:name) & api.config.browsers).map(&api.method(:find_browser))
-    rng_size = 6
-    cwidth   = 2 + browsers.reduce(0) do |num, browser|
+  def self.max_col_width(browsers)
+    browsers.reduce(0) do |num, browser|
       num2 = [browser.name.size, browser.versions.map(&:size).max].max
       num2 > num ? num2 : num
     end
+  end
 
-    cwidth += 1 if cwidth % 2 != 0
-
+  def self.view(*args)
+    init_renderer!
+    feature,  = args
     h, w      = IO.console.winsize
+    ft        = api.find_feature feature
+    browsers  = (api.browsers.map(&:name) & api.config.browsers).map(&api.method(:find_browser))
+    rng_size  = 6
+    cwidth    = 2 + max_col_width(browsers)
+    cwidth    = cwidth % 2 == 0 ? cwidth : cwidth + 1
     table_len = cwidth * browsers.size + browsers.size - 1
-    psen      = 'global support: '
+
+    while table_len > w
+      browsers = browsers[0..-2]
+      cwidth    = 2 + max_col_width(browsers)
+      cwidth    = cwidth % 2 == 0 ? cwidth : cwidth + 1
+      cwidth    = [cwidth, 8].max
+      table_len = cwidth * browsers.size + browsers.size - 1
+    end
+
+    psen      = w < 60 ? '' : 'support: '
     perc      = format '%.2f%%', ft.percent
-    ptot_len  = table_len - perc.size - psen.size
-    titlesize = ft.title.size >= (ptot_len - 2) ? (ptot_len - 10) : ft.title.size
+    titlesize = table_len - perc.size - psen.size - (w >= 60 ? 7 : 2)
+    titlesize = 0 if titlesize < 0
     titlechnk = ft.title.chars.each_slice(titlesize).map { |gr| gr.compact.join }
     hs        = browsers.size
     txo       = hs * cwidth + hs - 1
@@ -186,7 +203,7 @@ module Cani
 
     # draw 'global support: ' string at top right
     # before the percentage symbol
-    Curses.setpos yy, lx + ptot_len
+    Curses.setpos yy, lx + table_len - perc.size - psen.size
     Curses.addstr psen
 
     # draw the global support percentage at outer most top right
@@ -196,7 +213,13 @@ module Cani
     end
 
     # draw feature status after the title
-    Curses.setpos yy, lx + titlesize + 1
+    if w >= 60
+      Curses.setpos yy, lx + [titlesize, ft.title.size].min + 1
+    else
+      Curses.setpos yy + 1, lx + table_len - 4
+      titlechnk << ' ' if titlechnk.size == 1
+    end
+
     Curses.attron STATUS_MAP.fetch(ft.status, STATUS_MAP['*']) do
       Curses.addstr "[#{ft.status}]"
     end
@@ -298,14 +321,17 @@ module Cani
     if Curses.getch == Curses::KEY_RESIZE
       Curses.clear
       view feature
+    else
+      Curses.close_screen
+      use
     end
   ensure
     Curses.close_screen
-    use nil
   end
 
-  def self.show(brws = api.config.args[1], version = api.config.args[2])
-    browser = api.find_browser brws
+  def self.show(*args)
+    _, brws, version, = args
+    browser           = api.find_browser brws
 
     if browser
       if version
@@ -313,14 +339,14 @@ module Cani
                  header: "show:#{browser.title.downcase}:#{version}]   [#{Api::Feature.support_legend}",
                  colors: [:green, :light_black, :light_white]
 
-        show browser.title, nil
+        show browser.title
       else
         if (version = Fzf.pick(Fzf.browser_usage_rows(browser),
                                header: [:show, browser.title],
                                colors: %i[white light_black]).first)
           show browser.title, version
         else
-          show nil, nil
+          show
         end
       end
     else
@@ -328,7 +354,7 @@ module Cani
                                           header: [:show],
                                           colors: %i[white light_black]).first
 
-      show browser.title, nil unless browser.nil?
+      show browser.title unless browser.nil?
     end
   end
 end
