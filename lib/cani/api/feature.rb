@@ -10,13 +10,13 @@ module Cani
       }.freeze
 
       TYPES = {
-        'y' => {symbol: '+', name: :default,     short: :def},
-        'a' => {symbol: '~', name: :partial,     short: :part},
-        'n' => {symbol: '-', name: :unsupported, short: :unsup},
-        'p' => {symbol: '#', name: :polyfill,    short: :poly},
-        'x' => {symbol: '@', name: :prefix,      short: :prfx},
-        'd' => {symbol: '!', name: :flag,        short: :flag},
-        'u' => {symbol: '?', name: :unknown,     short: :unkn}
+        'y' => {symbol: '+', name: :default,     short: :sup},
+        'a' => {symbol: '~', name: :partial,     short: :prt},
+        'n' => {symbol: '-', name: :unsupported, short: :not},
+        'p' => {symbol: '#', name: :polyfill,    short: :ply},
+        'x' => {symbol: '@', name: :prefix,      short: :pfx},
+        'd' => {symbol: '!', name: :flag,        short: :flg},
+        'u' => {symbol: '?', name: :unknown,     short: :unk}
       }.freeze
 
       def initialize(attributes = {})

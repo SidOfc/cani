@@ -151,7 +151,7 @@ module Cani
             # draw browser names
             Curses.setpos by, bx
             Curses.attron color(:header) do
-              Curses.addstr browser.name.center(col_width)
+              Curses.addstr browser.name.tr('_', '.').center(col_width)
             end
 
             # accordingly increment current browser y for the table header (browser names)
@@ -261,7 +261,7 @@ module Cani
             @viewable -= 1
           end
 
-          @col_width   = colw
+          @col_width   = [colw, Feature::TYPES.map { |(_, h)| h[:short].size }.max + 3].max
           @table_width = tablew
         end
 
