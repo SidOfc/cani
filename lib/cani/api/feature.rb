@@ -1,7 +1,7 @@
 module Cani
   class Api
     class Feature
-      attr_reader :title, :status, :spec, :stats, :percent, :name
+      attr_reader :title, :status, :spec, :stats, :percent, :name, :browser_note_nums, :notes, :notes_by_num
 
       STATUSES = {
         'rec'   => 'rc',
@@ -25,9 +25,14 @@ module Cani
         @status  = STATUSES.fetch attributes['status'], attributes['status']
         @spec    = attributes['spec']
         @percent = attributes['usage_perc_y']
-        @stats   = attributes['stats'].each_with_object({}) do |(k, v), h|
-          h[k] = v.each_with_object({}) do |(vv, s), hh|
-            vv.split('-').each { |ver| hh[ver] = s[0] }
+        @notes   = attributes['notes'].split "\n"
+        @notes_by_num = attributes['notes_by_num']
+        @stats, @browser_note_nums = attributes['stats'].each_with_object([{}, {}]) do |(browser, info), (stts, notes)|
+          stts[browser], notes[browser] = info.each_with_object([{}, {}]) do |(version, stat), (st, nt)|
+            version.split('-').each do |v|
+              nt[v] = stat.scan(/#(\d+)/).flatten
+              st[v] = stat[' d '] ? 'd' : stat[0]
+            end
           end
         end
       end
