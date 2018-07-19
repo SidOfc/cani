@@ -31,15 +31,16 @@ module Cani
     def self.feature_rows
       @feature_rows ||= Cani.api.features.map do |ft|
         pc = format('%.2f%%', ft.percent).rjust 6
+        cl = {'un' => :yellow, 'ot' => :magenta}.fetch ft.status, :green
         tt = format('%-24s', ft.title.size > 24 ? ft.title[0..23].strip + '..'
                                                 : ft.title)
 
-        ["[#{ft.status}]", pc, tt, *ft.current_support]
+        [{content: "[#{ft.status}]", color: cl}, pc, tt, *ft.current_support]
       end
     end
 
     def self.browser_rows
-      Cani.api.browsers.map do |bwsr|
+      @browser_rows ||= Cani.api.browsers.map do |bwsr|
         [bwsr.title, 'usage: ' + format('%.4f%%', bwsr.usage.values.sum)]
       end
     end
@@ -54,7 +55,9 @@ module Cani
       Api::Feature::TYPES.flat_map do |(status, type)|
         if (features = features_by_support.fetch(type[:name], nil))
           features.map do |feature|
-            ["[#{feature[:status]}]", "[#{type[:symbol]}]", feature[:title]]
+            color = {'un' => :yellow, 'ot' => :magenta}.fetch feature[:status], :green
+            [{content: "[#{feature[:status]}]", color: color},
+             "[#{type[:symbol]}]", feature[:title]]
           end
         end
       end.compact
@@ -66,6 +69,7 @@ module Cani
 
       rows.each do |row|
         row.each.with_index do |column, i|
+          column = column[:content] if column.is_a? Hash
           col_width     = column.size
           col_widths[i] = col_width if col_width > col_widths[i].to_i
         end
@@ -73,10 +77,12 @@ module Cani
 
       rows.map do |row|
         row.map.with_index do |col, i|
+          color  = col[:color] if col.is_a? Hash
+          col    = col[:content] if col.is_a? Hash
           result = col.to_s.ljust col_widths[i]
 
           if STDOUT.tty?
-            result.colorize(colors[i] || colors[-1] || :default)
+            result.colorize(color || colors[i] || colors[-1] || :default)
                   .gsub '"', '\"'
           else
             result
