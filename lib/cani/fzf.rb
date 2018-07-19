@@ -29,7 +29,7 @@ module Cani
     end
 
     def self.feature_rows
-      Cani.api.features.map do |ft|
+      @feature_rows ||= Cani.api.features.map do |ft|
         pc = format('%.2f%%', ft.percent).rjust 6
         tt = format('%-24s', ft.title.size > 24 ? ft.title[0..23].strip + '..'
                                                 : ft.title)

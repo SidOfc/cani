@@ -3,6 +3,7 @@ require 'net/http'
 require_relative 'api/config'
 require_relative 'api/browser'
 require_relative 'api/feature'
+require_relative 'api/feature/viewer'
 
 module Cani
   class Api
