@@ -3,12 +3,21 @@ module Cani
     def self.generate_fish
       gem_root = File.join File.dirname(__FILE__), '../../'
       tpl      = File.read File.join(gem_root, 'shell/completions/functions.fish')
-      shw      = Cani.api.browsers.reduce String.new do |acc, browser|
-        [acc, "complete -f -c cani -n '__fish_cani_using_command show' -a '#{browser.abbr}' -d '#{browser.label}'",
-         "complete -f -c cani -n '__fish_cani_showing_browser #{browser.abbr}' -a '#{browser.versions.reverse.join(' ')}'"].join("\n")
+
+      shw = Cani.api.browsers.reduce String.new do |acc, browser|
+        versions = browser.versions.reverse.join(' ')
+        acc +
+        "\ncomplete -f -c cani -n '__fish_cani_using_command show' -a '#{browser.abbr}' -d '#{browser.label}'" +
+        "\ncomplete -f -c cani -n '__fish_cani_showing_browser #{browser.abbr}' -a '#{versions}'"
       end
 
-      tpl + shw
+      use = Cani.api.features.reduce String.new do |acc, feature|
+        description = feature.title.size > 40 ? feature.title[0..28] + '..' : feature.title
+        acc +
+        "\ncomplete -f -c cani -n '__fish_cani_using_command use' -a '#{feature.name}' -d '#{description}'"
+      end
+
+      tpl + shw + "\n" + use
     end
 
     def self.generate_zsh
@@ -22,6 +31,7 @@ module Cani
       end.strip
 
       tpl.gsub('{{names}}', Cani.api.browsers.map(&:abbr).join(' '))
+         .gsub('{{features}}', Cani.api.features.map(&:name).join(' '))
          .gsub '{{versions}}', versions
     end
 
@@ -36,6 +46,7 @@ module Cani
       end.strip
 
       tpl.gsub('{{names}}', Cani.api.browsers.map(&:abbr).join(' '))
+         .gsub('{{features}}', Cani.api.features.map(&:name).join(' '))
          .gsub '{{versions}}', versions
     end
 

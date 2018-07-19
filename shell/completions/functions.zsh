@@ -20,6 +20,9 @@ function _cani {
         {{versions}}
       esac
       ;;
+    use)
+      _arguments -C "1: :({{features}})"
+      ;;
   esac
 }
 
