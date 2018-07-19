@@ -15,6 +15,9 @@ _cani_completions() {
           ;;
       esac
       ;;
+    "use")
+      COMPREPLY=($(compgen -W "{{features}}" "${COMP_WORDS[COMP_CWORD]}"))
+      ;;
     *)
       COMPREPLY=($(compgen -W "use show help version update purge install_completions" "${COMP_WORDS[COMP_CWORD]}"))
       ;;

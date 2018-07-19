@@ -46,6 +46,7 @@ module Cani
       end.strip
 
       tpl.gsub('{{names}}', Cani.api.browsers.map(&:abbr).join(' '))
+         .gsub('{{features}}', Cani.api.features.map(&:name).join(' '))
          .gsub '{{versions}}', versions
     end
 
