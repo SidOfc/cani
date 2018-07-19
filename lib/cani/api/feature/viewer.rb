@@ -57,7 +57,7 @@ module Cani
         PADDING = 1  # horizontal cell padding
         MARGIN  = 1  # horizontal cell margin
 
-        def initialize(feature, browsers = [])
+        def initialize(feature, browsers = Cani.api.browsers)
           @feature  = feature
           @browsers = browsers
           @viewable = browsers.size

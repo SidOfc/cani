@@ -93,10 +93,8 @@ module Cani
   end
 
   def self.use(feature = nil)
-    viewer_browsers = (api.browsers.map(&:name) & config.browsers).map(&api.method(:find_browser))
-
     if feature && (feature = api.find_feature(feature))
-      Api::Feature::Viewer.new(feature, viewer_browsers).render
+      Api::Feature::Viewer.new(feature).render
       use
     elsif (chosen = Fzf.pick(Fzf.feature_rows,
                              header: 'use]   [' + Api::Feature.support_legend,
@@ -104,7 +102,7 @@ module Cani
 
       # chosen[2] is the index of the title column from Fzf.feature_rows
       if chosen.any? && (feature = api.find_feature(chosen[2]))
-        Api::Feature::Viewer.new(feature, viewer_browsers).render
+        Api::Feature::Viewer.new(feature).render
         use
       else
         exit
