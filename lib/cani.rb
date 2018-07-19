@@ -40,34 +40,44 @@ module Cani
   end
 
   def self.help
-    puts "Cani #{VERSION} <https://github.com/SidOfc/cani>"
+    String.disable_colorization true unless STDOUT.tty?
+    puts "Cani ".light_yellow + VERSION.to_s + ' <https://github.com/SidOfc/cani>'.light_black
     puts ''
-    puts 'Usage: cani [COMMAND [ARGUMENTS]]'
+    puts 'This command provides a TUI interface to access caniuse.com data.'.light_black
+    puts 'It allows one to search by browser / version using the \'show\' command'.light_black
+    puts 'and by feature using the \'use\' command. Pressing <enter> on a feature'.light_black
+    puts 'in the \'use\' overview or calling \'use some-feature\' will display a'.light_black
+    puts 'table as seen on caniuse.com using curses.'.light_black
     puts ''
-    puts 'Commands:'
-    puts '   use FEATURE             show browser support for FEATURE'
-    puts '   show BROWSER            show information about specific BROWSER'
-    puts '   install_completions     installs completions for bash, zsh and fish'
-    puts '   update                  force update api data and completions'
-    puts '   purge                   remove all completion, configuration and data'
-    puts '                           stored by this cani'
+    puts 'Usage:'.red
+    puts '   cani'.yellow + ' [COMMAND [ARGUMENTS]]'
+    puts ''
+    puts 'Commands:'.red
+    puts '   use '.blue + ' [FEATURE]             ' + 'show browser support for FEATURE'.light_black
+    puts '   show'.blue + ' [BROWSER [VERSION]]   ' + 'show information about specific BROWSER and VERSION'.light_black
     puts '   '
-    puts '   help                    show this help'
-    puts '   version                 print the version number'
+    puts '   install_completions        '.blue      + 'installs completions for bash, zsh and fish'.light_black
+    puts '   update                     '.blue      + 'force update api data and completions'.light_black
+    puts '   purge                      '.blue      + 'remove all completion, configuration and data'.light_black
+    puts '                              '.blue      + 'stored by this cani'.light_black
+    puts '   '
+    puts '   help                       '.blue      + 'show this help'.light_black
+    puts '   version                    '.blue      + 'print the version number'.light_black
     puts ''
-    puts 'Examples:'
-    puts '   cani use'
-    puts '   cani show ie'
-    puts '   cani show chr.and'
+    puts 'Examples:'.red
+    puts '   cani'.yellow + ' use'.blue
+    puts '   cani'.yellow + ' use'.blue  + ' \'box-shadow\''
+    puts '   cani'.yellow + ' show'.blue + ' ie'
+    puts '   cani'.yellow + ' show'.blue + ' ie 11'
     puts ''
-    puts 'Statuses:'
-    puts '   [ls]   WHATWG Living Standard'
-    puts '   [rc]   W3C Recommendation'
-    puts '   [pr]   W3C Proposed Recommendation'
-    puts '   [cr]   W3C Candidate Recommendation'
-    puts '   [wd]   W3C Working Draft'
-    puts '   [ot]   Non-W3C, but reputable'
-    puts '   [un]   Unofficial, Editor\'s draft or W3C "Note"'
+    puts 'Statuses:'.red
+    puts '   [ls]'.green   + '   WHATWG Living Standard'.light_black
+    puts '   [rc]'.green   + '   W3C Recommendation'.light_black
+    puts '   [pr]'.green   + '   W3C Proposed Recommendation'.light_black
+    puts '   [cr]'.green   + '   W3C Candidate Recommendation'.light_black
+    puts '   [wd]'.green   + '   W3C Working Draft'.light_black
+    puts '   [un]'.yellow  + '   Unofficial, Editor\'s draft or W3C "Note"'.light_black
+    puts '   [ot]'.magenta + '   Non-W3C, but reputable'.light_black
   end
 
   def self.version
