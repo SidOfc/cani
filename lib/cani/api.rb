@@ -1,8 +1,8 @@
 require 'net/http'
 
-require_relative 'api/config'
 require_relative 'api/browser'
 require_relative 'api/feature'
+require_relative 'api/feature/viewer'
 
 module Cani
   class Api
@@ -12,9 +12,9 @@ module Cani
 
     def load_data(fetch: false)
       @upd = false
-      data_file       = File.join config.directory, 'caniuse.json'
+      data_file       = File.join Cani.config.directory, 'caniuse.json'
       data_exists     = File.exist? data_file
-      data_up_to_date = data_exists ? (Time.now.to_i - File.mtime(data_file).to_i < config.expire.to_i)
+      data_up_to_date = data_exists ? (Time.now.to_i - File.mtime(data_file).to_i < Cani.config.expire.to_i)
                                     : false
 
       if !fetch && data_exists && data_up_to_date
@@ -40,7 +40,7 @@ module Cani
     end
 
     def remove!
-      data_file = File.join config.directory, 'caniuse.json'
+      data_file = File.join Cani.config.directory, 'caniuse.json'
 
       File.unlink data_file if File.exist? data_file
     end
@@ -53,14 +53,19 @@ module Cani
       @upd
     end
 
-    def config(**opts)
-      @settings ||= Config.new(**opts)
+    def find_feature(name)
+      name = Regexp.new name.to_s.downcase.gsub(/(\W)/, '.*')
+      idx  = features.find_index do |ft|
+        ft.title.downcase.match?(name) || ft.name.downcase.match?(name)
+      end
+
+      features[idx] if idx
     end
 
     def find_browser(name)
       name = name.to_s.downcase
       idx  = browsers.find_index do |bwsr|
-        [bwsr.title, bwsr.name, bwsr.abbr].include? name
+        [bwsr.title, bwsr.name, bwsr.abbr].map(&:downcase).include? name
       end
 
       browsers[idx] if idx
@@ -73,12 +78,12 @@ module Cani
     end
 
     def features
-      @features ||= @data['data'].values.map(&Feature.method(:new))
+      @features ||= @data['data'].map { |(name, info)| Feature.new info.merge(name: name) }
     end
 
     def raw
       begin
-        Net::HTTP.get URI(config.source)
+        Net::HTTP.get URI(Cani.config.source)
       rescue
         nil
       end

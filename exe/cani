@@ -4,17 +4,4 @@
 require 'bundler/setup'
 require 'cani'
 
-# extract first non-option (options starting with '-' or '--')
-# argument in ARGV.
-cmd ||= Cani.api.config.args.first
-
-# refresh all completions after new data has been fetched
-Cani::Completions.install! if Cani.api.updated?
-
-if cmd && Cani.respond_to?(cmd)
-  # if the command is recognized, execute it
-  Cani.send cmd
-else
-  # otherwise, display help message
-  Cani.help
-end
+Cani.exec! ARGV[0], *ARGV[1..-1]

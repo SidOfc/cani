@@ -1,7 +1,7 @@
 module Cani
   class Api
     class Feature
-      attr_reader :title, :status, :spec, :stats, :percent
+      attr_reader :title, :status, :spec, :stats, :percent, :name
 
       STATUSES = {
         'rec'   => 'rc',
@@ -10,38 +10,42 @@ module Cani
       }.freeze
 
       TYPES = {
-        'y' => {symbol: '+', name: :default,     short: :def},
-        'a' => {symbol: '~', name: :partial,     short: :part},
-        'n' => {symbol: '-', name: :unsupported, short: :unsupp},
-        'p' => {symbol: '#', name: :polyfill,    short: :poly},
-        'x' => {symbol: '@', name: :prefix,      short: :prefix},
-        'd' => {symbol: '!', name: :flag,        short: :flag},
-        'u' => {symbol: '?', name: :unknown,     short: :unknown}
+        'y' => {symbol: '+', name: :default,     short: :sup},
+        'a' => {symbol: '~', name: :partial,     short: :prt},
+        'n' => {symbol: '-', name: :unsupported, short: :not},
+        'p' => {symbol: '#', name: :polyfill,    short: :ply},
+        'x' => {symbol: '@', name: :prefix,      short: :pfx},
+        'd' => {symbol: '!', name: :flag,        short: :flg},
+        'u' => {symbol: '?', name: :unknown,     short: :unk}
       }.freeze
 
       def initialize(attributes = {})
+        @name    = attributes[:name].to_s.downcase
         @title   = attributes['title']
         @status  = STATUSES.fetch attributes['status'], attributes['status']
         @spec    = attributes['spec']
         @percent = attributes['usage_perc_y']
         @stats   = attributes['stats'].each_with_object({}) do |(k, v), h|
-          h[k] = v.map { |(vv, s)| [vv.downcase, s.to_s[0] || ''] }.to_h
+          h[k] = v.each_with_object({}) do |(vv, s), hh|
+            vv.split('-').each { |ver| hh[ver] = s[0] }
+          end
         end
       end
 
       def current_support
-        @current_support ||= Cani.api.config.browsers.map do |browser|
+        @current_support ||= Cani.config.browsers.map do |browser|
           bridx = Cani.api.browsers.find_index { |brs| brs.name == browser }
           brwsr = Cani.api.browsers[bridx] unless bridx.nil?
-          syms  = stats[browser].values.map { |s| TYPES[s][:symbol] || '' }
-                                .join.rjust Cani.api.config.versions
+          syms  = stats[browser].values.compact.last(Cani.config.versions)
+                                .map { |s| TYPES[s][:symbol] || '' }
+                                .join.rjust Cani.config.versions
 
           syms + brwsr.abbr
         end
       end
 
       def support_in(browser, version)
-        TYPES.fetch(stats[browser.to_s][version.to_s], {})
+        TYPES.fetch(stats[browser.to_s][version.to_s.downcase], {})
              .fetch :name, :unknown
       end
 

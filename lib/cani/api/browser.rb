@@ -1,7 +1,7 @@
 module Cani
   class Api
     class Browser
-      attr_reader :name, :title, :prefix, :type, :versions, :usage, :abbr, :label
+      attr_reader :name, :title, :prefix, :type, :versions, :usage, :abbr, :label, :eras
 
       ABBR_MAP  = { 'ios' => 'saf.ios' }.freeze
       LABEL_MAP = {
@@ -34,12 +34,30 @@ module Cani
         @title    = attributes['browser'].downcase
         @prefix   = attributes['prefix'].downcase
         @type     = attributes['type'].downcase
-        @usage    = attributes['usage_global']
+        @usage    = attributes['usage_global'].each_with_object({}) do |(v, u), h|
+          v.split('-').each { |ver| h[ver] = u }
+        end
+        @eras = attributes['versions'].each_with_object([]) do |v, a|
+          if v
+            v.split('-').each { |ver| a << ver }
+          else
+            a << v
+          end
+        end
         @versions = @usage.keys
+        @features = {}
+      end
+
+      def most_popular_era_idx
+        eras.find_index usage.sort_by { |_, v| -v }.first.first
+      end
+
+      def max_column_width
+        [name.size, versions.map(&:size).max].max
       end
 
       def features_for(version)
-        Cani.api.features.each_with_object({}) do |ft, h|
+        @features[version] ||= Cani.api.features.each_with_object({}) do |ft, h|
           type = ft.support_in name, version
           (h[type] ||= []) << { support: type, title: ft.title,
                                 status: ft.status, percent: ft.percent }

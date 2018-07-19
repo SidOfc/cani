@@ -3,12 +3,21 @@ module Cani
     def self.generate_fish
       gem_root = File.join File.dirname(__FILE__), '../../'
       tpl      = File.read File.join(gem_root, 'shell/completions/functions.fish')
-      shw      = Cani.api.browsers.reduce String.new do |acc, browser|
-        [acc, "complete -f -c cani -n '__fish_cani_using_command show' -a '#{browser.abbr}' -d '#{browser.label}'",
-         "complete -f -c cani -n '__fish_cani_showing_browser #{browser.abbr}' -a '#{browser.versions.reverse.join(' ')}'"].join("\n")
+
+      shw = Cani.api.browsers.reduce String.new do |acc, browser|
+        versions = browser.versions.reverse.join(' ')
+        acc +
+        "\ncomplete -f -c cani -n '__fish_cani_using_command show' -a '#{browser.abbr}' -d '#{browser.label}'" +
+        "\ncomplete -f -c cani -n '__fish_cani_showing_browser #{browser.abbr}' -a '#{versions}'"
       end
 
-      tpl + shw
+      use = Cani.api.features.reduce String.new do |acc, feature|
+        description = feature.title.size > 40 ? feature.title[0..28] + '..' : feature.title
+        acc +
+        "\ncomplete -f -c cani -n '__fish_cani_using_command use' -a '#{feature.name}' -d '#{description}'"
+      end
+
+      tpl + shw + "\n" + use
     end
 
     def self.generate_zsh
@@ -22,6 +31,7 @@ module Cani
       end.strip
 
       tpl.gsub('{{names}}', Cani.api.browsers.map(&:abbr).join(' '))
+         .gsub('{{features}}', Cani.api.features.map(&:name).join(' '))
          .gsub '{{versions}}', versions
     end
 
@@ -36,21 +46,22 @@ module Cani
       end.strip
 
       tpl.gsub('{{names}}', Cani.api.browsers.map(&:abbr).join(' '))
+         .gsub('{{features}}', Cani.api.features.map(&:name).join(' '))
          .gsub '{{versions}}', versions
     end
 
     def self.install!
       # create all parent folders
-      FileUtils.mkdir_p Cani.api.config.fish_comp_dir
-      FileUtils.mkdir_p Cani.api.config.comp_dir
+      FileUtils.mkdir_p Cani.config.fish_comp_dir
+      FileUtils.mkdir_p Cani.config.comp_dir
 
       # write each completion file
-      File.open File.join(Cani.api.config.fish_comp_dir, 'cani.fish'), 'w' do |file|
+      File.open File.join(Cani.config.fish_comp_dir, 'cani.fish'), 'w' do |file|
         file << generate_fish
       end
 
       %w[bash zsh].each do |shell|
-        File.open File.join(Cani.api.config.comp_dir, "_cani.#{shell}"), 'w' do |file|
+        File.open File.join(Cani.config.comp_dir, "_cani.#{shell}"), 'w' do |file|
           file << send("generate_#{shell}")
         end
       end
@@ -60,12 +71,12 @@ module Cani
     end
 
     def self.remove!
-      fish_comp = File.join Cani.api.config.fish_comp_dir, 'cani.fish'
+      fish_comp = File.join Cani.config.fish_comp_dir, 'cani.fish'
 
       File.unlink fish_comp if File.exist? fish_comp
 
       %w[bash zsh].each do |shell|
-        shell_comp = File.join Cani.api.config.comp_dir, "_cani.#{shell}"
+        shell_comp = File.join Cani.config.comp_dir, "_cani.#{shell}"
 
         File.unlink shell_comp if File.exist? shell_comp
       end
@@ -78,7 +89,7 @@ module Cani
       %w[bash zsh].each do |shell|
         shellrc   = File.join Dir.home, ".#{shell}rc"
         lines     = File.read(shellrc).split "\n"
-        comp_path = File.join Cani.api.config.comp_dir, "_cani.#{shell}"
+        comp_path = File.join Cani.config.comp_dir, "_cani.#{shell}"
         rm_idx    = lines.find_index { |l| l.match? comp_path }
 
         lines.delete_at rm_idx unless rm_idx.nil?
@@ -90,7 +101,7 @@ module Cani
       %w[bash zsh].each do |shell|
         shellrc   = File.join Dir.home, ".#{shell}rc"
         lines     = File.read(shellrc).split "\n"
-        comp_path = File.join Cani.api.config.comp_dir, "_cani.#{shell}"
+        comp_path = File.join Cani.config.comp_dir, "_cani.#{shell}"
         slidx     = lines.find_index { |l| l.match? comp_path }
 
         if slidx
