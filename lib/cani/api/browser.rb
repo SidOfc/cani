@@ -52,6 +52,10 @@ module Cani
         eras.find_index usage.sort_by { |_, v| -v }.first.first
       end
 
+      def max_column_width
+        [name.size, versions.map(&:size).max].max
+      end
+
       def features_for(version)
         @features[version] ||= Cani.api.features.each_with_object({}) do |ft, h|
           type = ft.support_in name, version
