@@ -89,7 +89,6 @@ module Cani
           Curses.init_screen
           Curses.curs_set 0
           Curses.noecho
-          Curses.cbreak
 
           if Curses.has_colors?
             Curses.use_default_colors
@@ -233,10 +232,12 @@ module Cani
           # plus the 2 blank lines above and below the eras
           cy += (ERAS - 1) * 4 + ERAS
 
-          # print legend header
-          Curses.setpos offset_y + cy, offset_x
-          Curses.attron color(:header) do
-            Curses.addstr legend_format
+          if height > cy + 3
+            # print legend header
+            Curses.setpos offset_y + cy, offset_x
+            Curses.attron color(:header) do
+              Curses.addstr legend_format
+            end
           end
 
           # increment current y by 2
@@ -246,17 +247,19 @@ module Cani
 
           # loop through all features to create a legend
           # showing which label belongs to which color
-          Feature::TYPES.values.each_slice viewable do |group|
-            group.compact.each.with_index do |type, lx|
-              Curses.setpos offset_y + cy, offset_x + lx * col_width + lx
-              Curses.attron color(type[:name], :fg) do
-                Curses.addstr "#{type[:short]}(#{type[:symbol]})".center(col_width)
+          if height > cy + 1
+            Feature::TYPES.values.each_slice viewable do |group|
+              group.compact.each.with_index do |type, lx|
+                Curses.setpos offset_y + cy, offset_x + lx * col_width + lx
+                Curses.attron color(type[:name], :fg) do
+                  Curses.addstr "#{type[:short]}(#{type[:symbol]})".center(col_width)
+                end
               end
-            end
 
-            # if there is more than one group, print the next
-            # group on a new line
-            cy += 1
+              # if there is more than one group, print the next
+              # group on a new line
+              cy += 1
+            end
           end
 
           # add extra empty line after legend
@@ -264,20 +267,22 @@ module Cani
 
           notes_chunked = feature.notes.map { |nt| nt.chars.each_slice(table_width).map(&:join).map(&:strip) }
           num_chunked   = feature.notes_by_num.each_with_object({}) { |(k, nt), h| h[k] = nt.chars.each_slice(table_width - 5).map(&:join).map(&:strip) }
+          notes_total   = notes_chunked.map(&:size).sum + num_chunked.map(&:size).sum
 
-          if notes_chunked.any? || num_chunked.any?
+          if height > cy + 2 && (notes_chunked.any? || num_chunked.any?)
             # print notes header
             Curses.setpos offset_y + cy, offset_x
             Curses.attron color(:header) do
               Curses.addstr notes_format
             end
-
-            # add two new lines, one for the notes header
-            # and one empty line below it
-            cy += 2
           end
 
+          # add two new lines, one for the notes header
+          # and one empty line below it
+          cy += 2
+
           notes_chunked.each do |chunks|
+            break if cy + 1 + chunks.size > height
             chunks.each do |part|
               Curses.setpos offset_y + cy, offset_x
               Curses.addstr part
@@ -288,10 +293,12 @@ module Cani
           end
 
           num_chunked.each do |num, chunks|
+            break if cy + 1 + chunks.size > height
             Curses.setpos offset_y + cy, offset_x
             Curses.attron color(:header) do
               Curses.addstr num.center(3)
             end
+
             chunks.each do |part|
               Curses.setpos offset_y + cy, offset_x + 5
               Curses.addstr part
