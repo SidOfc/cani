@@ -41,16 +41,16 @@ module Cani
 
     def self.install!
       # create all parent folders
-      FileUtils.mkdir_p Cani.api.config.fish_comp_dir
-      FileUtils.mkdir_p Cani.api.config.comp_dir
+      FileUtils.mkdir_p Cani.config.fish_comp_dir
+      FileUtils.mkdir_p Cani.config.comp_dir
 
       # write each completion file
-      File.open File.join(Cani.api.config.fish_comp_dir, 'cani.fish'), 'w' do |file|
+      File.open File.join(Cani.config.fish_comp_dir, 'cani.fish'), 'w' do |file|
         file << generate_fish
       end
 
       %w[bash zsh].each do |shell|
-        File.open File.join(Cani.api.config.comp_dir, "_cani.#{shell}"), 'w' do |file|
+        File.open File.join(Cani.config.comp_dir, "_cani.#{shell}"), 'w' do |file|
           file << send("generate_#{shell}")
         end
       end
@@ -60,12 +60,12 @@ module Cani
     end
 
     def self.remove!
-      fish_comp = File.join Cani.api.config.fish_comp_dir, 'cani.fish'
+      fish_comp = File.join Cani.config.fish_comp_dir, 'cani.fish'
 
       File.unlink fish_comp if File.exist? fish_comp
 
       %w[bash zsh].each do |shell|
-        shell_comp = File.join Cani.api.config.comp_dir, "_cani.#{shell}"
+        shell_comp = File.join Cani.config.comp_dir, "_cani.#{shell}"
 
         File.unlink shell_comp if File.exist? shell_comp
       end
@@ -78,7 +78,7 @@ module Cani
       %w[bash zsh].each do |shell|
         shellrc   = File.join Dir.home, ".#{shell}rc"
         lines     = File.read(shellrc).split "\n"
-        comp_path = File.join Cani.api.config.comp_dir, "_cani.#{shell}"
+        comp_path = File.join Cani.config.comp_dir, "_cani.#{shell}"
         rm_idx    = lines.find_index { |l| l.match? comp_path }
 
         lines.delete_at rm_idx unless rm_idx.nil?
@@ -90,7 +90,7 @@ module Cani
       %w[bash zsh].each do |shell|
         shellrc   = File.join Dir.home, ".#{shell}rc"
         lines     = File.read(shellrc).split "\n"
-        comp_path = File.join Cani.api.config.comp_dir, "_cani.#{shell}"
+        comp_path = File.join Cani.config.comp_dir, "_cani.#{shell}"
         slidx     = lines.find_index { |l| l.match? comp_path }
 
         if slidx
