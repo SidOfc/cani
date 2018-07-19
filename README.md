@@ -24,6 +24,11 @@ Or install it yourself as:
 
     $ gem install cani
 
+**dependencies**
+
+Cani depends on [fzf](https://github.com/junegunn/fzf) to display most menu's.
+<!-- Fzf is not a requirement when piping the output to another command -->
+
 ## Configuration
 
 After installation, running the command (`cani`) for the first time will create some files and directories:
