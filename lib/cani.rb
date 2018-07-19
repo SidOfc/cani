@@ -24,7 +24,7 @@ module Cani
 
 
   def self.exec!(command, *args)
-    command = :help unless respond_to? command
+    command = :help unless command && respond_to?(command)
     command = command.to_s.downcase.to_sym
 
     case command
