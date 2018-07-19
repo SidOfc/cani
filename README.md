@@ -1,9 +1,9 @@
-# Cani
+# Cani &mdash; a [caniuse.com](caniuse.com) tui interface
 
 ![cani cli](/assets/cani.png)
 
 Cani is a small command-line wrapper around the data of [caniuse](https://caniuse.com).
-It uses [fzf](https://github.com/junegunn/fzf) to display results.
+It uses [fzf](https://github.com/junegunn/fzf) and [curses](https://github.com/ruby/curses) to display results.
 This wrapper aims to be easy to use out of the box. To achieve this it ships with completions
 for `bash`, `fish`, and `zsh`. [Caniuse data (1.7MB)](https://github.com/Fyrd/caniuse/blob/master/data.json) is fetched and updated automatically
 on a regular interval together with completions.
@@ -47,8 +47,8 @@ There are some commented settings that can be adjusted in the `~/.config/cani/co
 Running `cani` without arguments yields the help description.
 Cani supports the following actions:
 
-- [`use`](#use) - show browser support for all features
-- [`show BROWSER VERSION`](#show) - show feature support based on selected browser / version
+- [`use [FEATURE]`](#use) - show browser support for selected feature
+- [`show [BROWSER [VERSION]]`](#show) - show feature support based on selected browser / version
 - [`help`](#help) - show help
 - [`version`](#version) - print the version number
 - [`update`](#update) - force update data and completions
@@ -64,6 +64,24 @@ cani use
 Show a list of features with fzf. Features are shown with their current W3C status, percentage of support, title and
 each individual browser's support on a single row.
 
+This command may be invoked with a feature and supports <kbd>tab</kbd> completion in `bash`, `zsh` and `fish`:
+
+```sh
+cani use box-shadow
+
+# or:
+# cani use 'box shadow'
+# cani use 'boxshadow'
+```
+
+The above command will show the following table:
+
+![Cani use box-shadow support table](/assets/cani-feature-table.png)
+
+The table is responsive and will show browsers that fit in available space, everything else wraps accordingly.
+The 3-line high era in the middle resembles the "current era" of most used browsers. Browser versions with less than `0.5%` usage aren't shown.
+At the bottom there is a legend that provides an abbreviated status color overview.
+
 ### show
 
 ```sh
@@ -75,7 +93,7 @@ Selecting a version shows the final window with feature support for that specifi
 Navigating to the previous window is possible by pressing <kbd>escape</kbd>, this will move you up one level.
 When <kbd>escape</kbd> is pressed at the browser selection menu, the command will exit.
 
-This command can also be invoked directly with a browser and version:
+This command may be invoked with a browser and / or version and supports <kbd>tab</kbd> completion in `bash`, `zsh` and `fish`:
 
 ```sh
 # show all versions of chrome
@@ -133,9 +151,9 @@ After running a `purge`, all that remains is running `gem uninstall cani` to com
 
 Last but not least, all `cani` commands can be piped. This will skip running `fzf` and print uncolored output.
 
-**use**
+**use** _(the output of_ `cani use ft-name` _cannot be piped)_
 ```sh
-cani use | cat | head -3
+cani use | head -3
 [rc]   97.11%   PNG alpha transparency       +chr   +ff   +edge   +ie   +saf   +saf.ios   +op   +and   +bb
 [un]   75.85%   Animated PNG (APNG)          +chr   +ff   -edge   -ie   +saf   +saf.ios   +op   -and   -bb
 [ls]   94.32%   Video element                +chr   +ff   +edge   +ie   +saf   +saf.ios   +op   +and   +bb
@@ -143,7 +161,7 @@ cani use | cat | head -3
 
 **show**
 ```sh
-cani show | cat | head -3
+cani show | head -3
 ie                       usage: 3.1899%
 edge                     usage: 1.8262%
 firefox                  usage: 5.0480%
@@ -151,7 +169,7 @@ firefox                  usage: 5.0480%
 
 **show BROWSER**
 ```sh
-cani show firefox | cat | head -3
+cani show firefox | head -3
 63    usage: 0.0000%
 62    usage: 0.0131%
 61    usage: 0.2184%
@@ -159,7 +177,7 @@ cani show firefox | cat | head -3
 
 **show BROWSER VERSION**
 ```sh
-cani show firefox 63 | cat | head -3
+cani show firefox 63 | head -3
 [rc]   [+]   PNG alpha transparency
 [un]   [+]   Animated PNG (APNG)
 [ls]   [+]   Video element
