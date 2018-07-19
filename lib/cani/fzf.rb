@@ -1,12 +1,12 @@
 module Cani
   module Fzf
     def self.pick(rows, **opts)
-      unless executable?
-        puts 'fatal: command "fzf" not found, is it installed?'
-        exit 1
-      end
-
       if STDOUT.tty?
+        unless executable?
+          puts 'Cani fatal: command "fzf" not found, is it installed?'
+          exit 1
+        end
+
         rows   = tableize_rows(rows, **opts).join "\n"
         ohdr   = opts.fetch :header, []
         header = ohdr.is_a?(Array) ? [:cani, *ohdr].map { |v| v.to_s.downcase }.join(':')

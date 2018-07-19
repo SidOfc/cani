@@ -34,7 +34,7 @@ module Cani
       else
         # no other option but fail since we have no data
         # and no way of fetching the data to display
-        puts 'fatal: no data available for display'
+        puts 'Cani fatal: no data available for display'
         exit 1
       end
     end
