@@ -1,6 +1,5 @@
 require 'net/http'
 
-require_relative 'api/config'
 require_relative 'api/browser'
 require_relative 'api/feature'
 require_relative 'api/feature/viewer'
@@ -13,9 +12,9 @@ module Cani
 
     def load_data(fetch: false)
       @upd = false
-      data_file       = File.join config.directory, 'caniuse.json'
+      data_file       = File.join Cani.config.directory, 'caniuse.json'
       data_exists     = File.exist? data_file
-      data_up_to_date = data_exists ? (Time.now.to_i - File.mtime(data_file).to_i < config.expire.to_i)
+      data_up_to_date = data_exists ? (Time.now.to_i - File.mtime(data_file).to_i < Cani.config.expire.to_i)
                                     : false
 
       if !fetch && data_exists && data_up_to_date
@@ -41,7 +40,7 @@ module Cani
     end
 
     def remove!
-      data_file = File.join config.directory, 'caniuse.json'
+      data_file = File.join Cani.config.directory, 'caniuse.json'
 
       File.unlink data_file if File.exist? data_file
     end
@@ -52,10 +51,6 @@ module Cani
 
     def updated?
       @upd
-    end
-
-    def config(**opts)
-      @settings ||= Config.new(**opts)
     end
 
     def find_feature(name)
@@ -88,7 +83,7 @@ module Cani
 
     def raw
       begin
-        Net::HTTP.get URI(config.source)
+        Net::HTTP.get URI(Cani.config.source)
       rescue
         nil
       end

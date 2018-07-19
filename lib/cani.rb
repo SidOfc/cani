@@ -6,9 +6,10 @@ require 'colorize'
 require 'json'
 require 'yaml'
 
-require 'cani/version'
 require 'cani/api'
 require 'cani/fzf'
+require 'cani/config'
+require 'cani/version'
 require 'cani/completions'
 
 # Cani
@@ -16,6 +17,11 @@ module Cani
   def self.api
     @api ||= Api.new
   end
+
+  def self.config
+    @settings ||= Config.new
+  end
+
 
   def self.exec!(command, *args)
     command = :help unless respond_to? command
@@ -75,7 +81,7 @@ module Cani
   def self.purge
     Completions.remove!
     api.remove!
-    api.config.remove!
+    config.remove!
   end
 
   def self.update
@@ -83,11 +89,11 @@ module Cani
   end
 
   def self.edit
-    system ENV.fetch('EDITOR', 'vim'), api.config.file
+    system ENV.fetch('EDITOR', 'vim'), config.file
   end
 
   def self.use(feature = nil)
-    viewer_browsers = (api.browsers.map(&:name) & api.config.browsers).map(&api.method(:find_browser))
+    viewer_browsers = (api.browsers.map(&:name) & config.browsers).map(&api.method(:find_browser))
 
     if feature && (feature = api.find_feature(feature))
       Api::Feature::Viewer.new(feature, viewer_browsers).render
