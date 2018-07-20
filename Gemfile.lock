@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    cani (0.2.0)
+    cani (0.2.2)
       colorize
       curses
       json
