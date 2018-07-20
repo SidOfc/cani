@@ -159,6 +159,8 @@ module Cani
             Curses.addstr status_format
           end
 
+          compact_height = height <= 40
+
           # meaty part, loop through browsers to create
           # the final feature table
           browsers[0...viewable].each.with_index do |browser, x|
@@ -187,8 +189,8 @@ module Cani
               is_current = cur_era == era_idx
               past_curr  = cur_era > era_idx
               top_pad    = 1
-              bot_pad    = 1
-              ey         = by + (y * 4)
+              bot_pad    = compact_height ? 0 : 1
+              ey         = by + (y * (2 + top_pad + bot_pad)) + (bot_pad.zero? && past_curr ? 1 : 0)
               note_nums  = feature.browser_note_nums.fetch(browser.name, {})
                                                     .fetch(era, [])
 
@@ -196,14 +198,14 @@ module Cani
                 Curses.setpos ey - top_pad - 1, bx - 1
                 Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + 2) }
 
-                Curses.setpos ey + bot_pad + 1, bx - 1
+                Curses.setpos ey + (is_current ? 1 : bot_pad) + 1, bx - 1
                 Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + 2) }
               end
 
               # only show visible / relevant browsers
               if browser.usage[era].to_i >= 0.5 || (!era.empty? && cur_era >= era_idx)
-                ((ey - top_pad)..(ey + bot_pad)).each do |ry|
-                  txt = bot_pad.zero? ? (ry >= ey + bot_pad ? era.to_s : ' ')
+                ((ey - top_pad)..(ey + (is_current ? 1 : bot_pad))).each do |ry|
+                  txt = (bot_pad.zero? && !is_current) ? (ry >= ey + (is_current ? 1 : bot_pad) ? era.to_s : ' ')
                                       : (ry == ey ? era.to_s : ' ')
 
                   Curses.setpos ry, bx
@@ -230,7 +232,7 @@ module Cani
           # plus the 4 lines around the current era
           # plus the 1 line of browser names
           # plus the 2 blank lines above and below the eras
-          cy += (ERAS - 1) * 4 + ERAS
+          cy += (ERAS - 1) * (compact_height ? 3 : 4) + ERAS
 
           if height > cy + 3
             # print legend header
