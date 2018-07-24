@@ -110,18 +110,19 @@ module Cani
         def draw
           Curses.clear
 
+          outer_width   = table_width + 2
           percent_num   = format '%.2f%%', feature.percent
           status_format = "[#{feature.status}]"
           percent_label = compact? ? '' : 'support: '
-          legend_format = 'legend'.center table_width
-          notes_format  = 'notes'.center table_width
+          legend_format = 'legend'.center outer_width
+          notes_format  = 'notes'.center outer_width
 
-          offset_x      = ((width - table_width) / 2.0).floor
+          offset_x      = ((width - outer_width) / 2.0).floor
           offset_y      = 1
           cy            = 0
 
           # positioning and drawing of percentage
-          perc_num_xs = table_width - percent_num.size
+          perc_num_xs = outer_width - percent_num.size
           Curses.setpos offset_y + cy, offset_x + perc_num_xs
           Curses.attron percent_color(feature.percent) do
             Curses.addstr percent_num
@@ -267,8 +268,8 @@ module Cani
           # add extra empty line after legend
           cy += 1
 
-          notes_chunked = feature.notes.map { |nt| nt.chars.each_slice(table_width).map(&:join).map(&:strip) }
-          num_chunked   = feature.notes_by_num.each_with_object({}) { |(k, nt), h| h[k] = nt.chars.each_slice(table_width - 5).map(&:join).map(&:strip) }
+          notes_chunked = feature.notes.map { |nt| nt.chars.each_slice(outer_width).map(&:join).map(&:strip) }
+          num_chunked   = feature.notes_by_num.each_with_object({}) { |(k, nt), h| h[k] = nt.chars.each_slice(outer_width - 5).map(&:join).map(&:strip) }
           notes_total   = notes_chunked.map(&:size).sum + num_chunked.map(&:size).sum
 
           if height > cy + 2 && (notes_chunked.any? || num_chunked.any?)
