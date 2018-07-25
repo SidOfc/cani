@@ -59,6 +59,7 @@ Cani supports the following actions:
 - [`update`](#update) - force update data and completions
 - [`install_completions`](#install_completions) - install shell completions
 - [`purge`](#purge) - purge files and directories created by `cani`
+- [`edit`](#edit) - edit the default configuration file
 
 ### use
 
