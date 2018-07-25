@@ -125,11 +125,16 @@ module Cani
 
     if browser
       if version
-        Fzf.pick Fzf.browser_feature_rows(browser, version),
-                 header: "show:#{browser.title.downcase}:#{version}]   [#{Api::Feature.support_legend}",
-                 colors: [:green, :light_black, :light_white]
+        chosen = Fzf.pick Fzf.browser_feature_rows(browser, version),
+                          header: "show:#{browser.title.downcase}:#{version}]   [#{Api::Feature.support_legend}",
+                          colors: [:green, :light_black, :light_white]
 
-        show browser.title
+        if chosen.any? && (feature = api.find_feature(chosen[2]))
+          Api::Feature::Viewer.new(feature).render
+          show browser.title, version
+        else
+          show browser.title
+        end
       else
         if (version = Fzf.pick(Fzf.browser_usage_rows(browser),
                                header: [:show, browser.title],
