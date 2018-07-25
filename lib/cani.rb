@@ -51,8 +51,8 @@ module Cani
     puts 'in the \'use\' overview or calling \'use some-feature\' will display a'.light_black
     puts 'table as seen on caniuse.com using curses.'.light_black
     puts ''
-    puts 'cani is dependent on fzf (https://github.com/junegunn/fzf) for the interactive TUI to work.'
-    puts 'without fzf, commands can still be piped to get the regular (colorless) output'
+    puts 'cani is dependent on fzf (https://github.com/junegunn/fzf) for the interactive TUI to work.'.light_black
+    puts 'without fzf, commands can still be piped to get the regular (colorless) output'.light_black
     puts ''
     puts 'Usage:'.red
     puts '   cani'.yellow + ' [COMMAND [ARGUMENTS]]'
@@ -63,6 +63,7 @@ module Cani
     puts '   '
     puts '   install_completions        '.blue      + 'installs completions for bash, zsh and fish'.light_black
     puts '   update                     '.blue      + 'force update api data and completions'.light_black
+    puts '   edit                       '.blue      + 'edit configuration in $EDITOR'.light_black
     puts '   purge                      '.blue      + 'remove all completion, configuration and data'.light_black
     puts '                              '.blue      + 'stored by this cani'.light_black
     puts '   '
