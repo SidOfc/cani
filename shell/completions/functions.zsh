@@ -8,7 +8,7 @@
 function _cani {
   local line
 
-  _arguments -C "1: :(use show help version update purge install_completions)" \
+  _arguments -C "1: :(use show help version update purge edit install_completions)" \
                 "*::arg:->args"
 
   case $line[1] in
