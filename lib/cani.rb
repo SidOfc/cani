@@ -28,6 +28,8 @@ module Cani
     command = command.to_s.downcase.to_sym
 
     case command
+    when :edit
+      edit
     when :use
       use args[0]
     when :show
