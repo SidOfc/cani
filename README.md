@@ -152,6 +152,14 @@ Purges all files created by this command, removing every trace except the execut
 It will also remove source lines added that pointed to the completions in `~/.zshrc` and `~/.bashrc`.
 After running a `purge`, all that remains is running `gem uninstall cani` to completely purge it.
 
+### edit
+
+```sh
+cani edit
+```
+
+Edit the configuration file located at `~/.config/cani/config.yml` using `$EDITOR` env variable.
+
 ## Pipe output
 
 Last but not least, all `cani` commands can be piped. This will skip running `fzf` and print uncolored output.
