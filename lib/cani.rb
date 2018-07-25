@@ -103,9 +103,11 @@ module Cani
   end
 
   def self.use(feature = nil)
+    @use_min_depth ||= feature ? 1 : 0
+
     if feature && (feature = api.find_feature(feature))
       Api::Feature::Viewer.new(feature).render
-      use
+      use unless config.nav_type?('forward') && @use_min_depth > 0
     elsif (chosen = Fzf.pick(Fzf.feature_rows,
                              header: 'use]   [' + Api::Feature.support_legend,
                              colors: %i[green light_black light_white light_black]))
@@ -121,7 +123,8 @@ module Cani
   end
 
   def self.show(brws = nil, version = nil)
-    browser = api.find_browser brws
+    browser           = api.find_browser brws
+    @show_min_depth ||= 0 + (browser ? 1 : 0) + (version ? 1 : 0)
 
     if browser
       if version
@@ -131,6 +134,8 @@ module Cani
 
         show browser.title
       else
+        exit if config.nav_type?('forward') && @show_min_depth > 1
+
         if (version = Fzf.pick(Fzf.browser_usage_rows(browser),
                                header: [:show, browser.title],
                                colors: %i[white light_black]).first)
@@ -140,6 +145,8 @@ module Cani
         end
       end
     else
+      exit if config.nav_type?('forward') && @show_min_depth > 0
+
       browser = api.find_browser Fzf.pick(Fzf.browser_rows,
                                           header: [:show],
                                           colors: %i[white light_black]).first

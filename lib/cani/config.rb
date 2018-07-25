@@ -14,7 +14,8 @@ module Cani
 
       # usage settings
       'versions' => 1,
-      'browsers' => %w[ie edge chrome firefox safari ios_saf opera android bb]
+      'browsers' => %w[ie edge chrome firefox safari ios_saf opera android bb],
+      'navigate' => 'always'
     }.freeze
 
     def initialize(**opts)
@@ -54,6 +55,10 @@ module Cani
       FileUtils.rm_rf directory if Dir.exist? directory
     end
 
+    def nav_type?(type)
+      navigate == type.to_s
+    end
+
     def install!
       hrs  = (DEFAULTS['expire'] / 3600.to_f).round 2
       days = (hrs / 24.to_f).round 2
@@ -84,16 +89,20 @@ module Cani
         f << "# the \"source\" key is used to fetch the data required for\n"
         f << "# this command to work.\n"
         f << "source: #{source}\n\n"
+        f << "# navigating means reopening the previously open window when going back by pressing <escape>\n"
+        f << "# or opening the next menu by selecting an entry in fzf with <enter>\n"
+        f << "# there are two different navigation modes:\n"
+        f << "#   * 'always'  - always navigate back to the previous menu, exit only at root menu with <escape>\n"
+        f << "#   * 'forward' - only allow navigating forward and backwards upto the menu that cani was initially open\n"
+        f << "navigate: #{navigate}\n\n"
         f << "# the \"versions\" key defines how many versions of support\n"
         f << "# will be shown in the \"use\" command\n"
-        f << "# e.g. `-ie +edge` becomes `--ie ++edge` when this is set to 2, etc..."
+        f << "# e.g. `-ie +edge` becomes `--ie ++edge` when this is set to 2, etc...\n"
         f << "versions: #{versions}\n\n"
         f << "# the \"browsers\" key defines which browsers are shown\n"
         f << "# in the \"use\" command\n"
         f << "browsers:\n"
-        f << "  # enabled:\n"
         f << browsers.map { |bn| "  - #{bn}" }.join("\n") + "\n"
-        f << "  # others:\n"
         f << (Cani.api.browsers.map(&:name) - browsers).map { |bn| "  # - #{bn}" }.join("\n")
       end
 
