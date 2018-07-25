@@ -49,6 +49,9 @@ module Cani
     puts 'in the \'use\' overview or calling \'use some-feature\' will display a'.light_black
     puts 'table as seen on caniuse.com using curses.'.light_black
     puts ''
+    puts 'cani is dependent on fzf (https://github.com/junegunn/fzf) for the interactive TUI to work.'
+    puts 'without fzf, commands can still be piped to get the regular (colorless) output'
+    puts ''
     puts 'Usage:'.red
     puts '   cani'.yellow + ' [COMMAND [ARGUMENTS]]'
     puts ''
@@ -69,6 +72,7 @@ module Cani
     puts '   cani'.yellow + ' use'.blue  + ' \'box-shadow\''
     puts '   cani'.yellow + ' show'.blue + ' ie'
     puts '   cani'.yellow + ' show'.blue + ' ie 11'
+    puts '   cani'.yellow + ' show'.blue + ' ie' + ' |'.light_black + ' cat'.yellow
     puts ''
     puts 'Statuses:'.red
     puts '   [ls]'.green   + '   WHATWG Living Standard'.light_black
