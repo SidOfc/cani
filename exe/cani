@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'bundler/setup'
 require 'cani'
 
 Cani.exec! ARGV[0], *ARGV[1..-1]
