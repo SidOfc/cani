@@ -59,7 +59,7 @@ Cani supports the following actions:
 - [`update`](#update) - force update data and completions
 - [`install_completions`](#install_completions) - install shell completions
 - [`purge`](#purge) - purge files and directories created by `cani`
-- [`edit`](#edit) - edit the default configuration file
+- [`edit`](#edit) - edit the default configuration file with `$EDITOR`
 
 ### use
 
@@ -73,11 +73,11 @@ each individual browser's support on a single row.
 This command may be invoked with a feature and supports <kbd>tab</kbd> completion in `bash`, `zsh` and `fish`:
 
 ```sh
-cani use box-shadow
+cani use grid-layout
 
 # or:
-# cani use 'box shadow'
-# cani use 'boxshadow'
+# cani use 'grid layout'
+# cani use 'gridlayout'
 ```
 
 The above command will show the following table:
@@ -85,8 +85,13 @@ The above command will show the following table:
 ![Cani use box-shadow support table](/assets/cani-feature-table.png)
 
 The table is responsive and will show browsers that fit in available space, everything else wraps accordingly.
-The 3-line high era in the middle resembles the "current era" of most used browsers. Browser versions with less than `0.5%` usage aren't shown.
-At the bottom there is a legend that provides an abbreviated status color overview.
+The current era has a light-black border. Browser versions with less than `0.5%` usage aren't shown.
+At the bottom there is a legend that provides an abbreviated status color overview. Below that, additional notes can be found.
+Notes are shown based on relevant and visible browsers, all other notes are hidden (this can be changed in the config).
+
+If your display height is `<= 40` lines, era's will be displayed in a more compact manner while still allowing space for notes:
+
+![Cani use box-shadow support table](/assets/cani-feature-table-compressed.png)
 
 ### show
 
@@ -98,6 +103,7 @@ Show a list of browsers. Selecting a browser will take you to the versions for t
 Selecting a version shows the final window with feature support for that specific browser version.
 Navigating to the previous window is possible by pressing <kbd>escape</kbd>, this will move you up one level.
 When <kbd>escape</kbd> is pressed at the browser selection menu, the command will exit.
+Selecting a feature using <kbd>enter</kbd> will show you the **current** support table for that feature **regardless** of selected version.
 
 This command may be invoked with a browser and / or version and supports <kbd>tab</kbd> completion in `bash`, `zsh` and `fish`:
 
@@ -105,7 +111,7 @@ This command may be invoked with a browser and / or version and supports <kbd>ta
 # show all versions of chrome
 cani show chr
 
-# show all supported features in chrome 70
+# show all features with support level in chrome 70
 cani show chr 70
 ```
 
