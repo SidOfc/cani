@@ -204,6 +204,8 @@ module Cani
               note_nums  = feature.browser_note_nums.fetch(browser.name, {})
                                                     .fetch(era, [])
 
+              break if (ey + (is_current ? 1 : bot_pad) + 1) > height
+
               if is_current
                 Curses.setpos ey - top_pad - 1, bx - 1
                 Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + 2) }
