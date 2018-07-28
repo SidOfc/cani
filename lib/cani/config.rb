@@ -15,7 +15,8 @@ module Cani
       # usage settings
       'versions' => 1,
       'browsers' => %w[ie edge chrome firefox safari ios_saf opera android bb],
-      'navigate' => 'always'
+      'navigate' => 'always',
+      'notes'    => 'relevant'
     }.freeze
 
     def initialize(**opts)
@@ -95,6 +96,11 @@ module Cani
         f << "#   * 'always'  - always navigate back to the previous menu, exit only at root menu with <escape>\n"
         f << "#   * 'forward' - only allow navigating forward and backwards upto the menu that cani was initially open\n"
         f << "navigate: #{navigate}\n\n"
+        f << "# the notes property defines how notes should be displayed\n"
+        f << "# there are two different modes:\n"
+        f << "#   * 'all'      - show all notes, regardless of relevance\n"
+        f << "#   * 'relevant' - show only relevant (visible in an era) notes\n"
+        f << "notes: #{notes}\n\n"
         f << "# the \"versions\" key defines how many versions of support\n"
         f << "# will be shown in the \"use\" command\n"
         f << "# e.g. `-ie +edge` becomes `--ie ++edge` when this is set to 2, etc...\n"
