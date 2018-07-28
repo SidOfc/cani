@@ -270,7 +270,7 @@ module Cani
 
           notes_chunked = feature.notes.map { |nt| nt.chars.each_slice(outer_width).map(&:join).map(&:strip) }
           num_chunked   = feature.notes_by_num.each_with_object({}) { |(k, nt), h| h[k] = nt.chars.each_slice(outer_width - 5).map(&:join).map(&:strip) }
-          notes_total   = notes_chunked.map(&:size).sum + num_chunked.map(&:size).sum
+          notes_total   = (notes_chunked.map(&:size) + num_chunked.map(&:size)).reduce(0) { |total, add| total + add }
 
           if height > cy + 2 && (notes_chunked.any? || num_chunked.any?)
             # print notes header

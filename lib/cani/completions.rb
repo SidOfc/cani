@@ -90,7 +90,7 @@ module Cani
         shellrc   = File.join Dir.home, ".#{shell}rc"
         lines     = File.read(shellrc).split "\n"
         comp_path = File.join Cani.config.comp_dir, "_cani.#{shell}"
-        rm_idx    = lines.find_index { |l| l.match? comp_path }
+        rm_idx    = lines.find_index { |l| l.match comp_path }
 
         lines.delete_at rm_idx unless rm_idx.nil?
         File.write shellrc, lines.join("\n")
@@ -102,7 +102,7 @@ module Cani
         shellrc   = File.join Dir.home, ".#{shell}rc"
         lines     = File.read(shellrc).split "\n"
         comp_path = File.join Cani.config.comp_dir, "_cani.#{shell}"
-        slidx     = lines.find_index { |l| l.match? comp_path }
+        slidx     = lines.find_index { |l| l.match comp_path }
 
         if slidx
           lines[slidx] =
