@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'io/console'
+require 'fileutils'
 require 'curses'
 require 'colorize'
 require 'json'

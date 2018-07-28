@@ -41,7 +41,7 @@ module Cani
 
     def self.browser_rows
       @browser_rows ||= Cani.api.browsers.map do |bwsr|
-        [bwsr.title, 'usage: ' + format('%.4f%%', bwsr.usage.values.sum)]
+        [bwsr.title, 'usage: ' + format('%.4f%%', bwsr.usage.values.reduce(0) { |total, add| total + add })]
       end
     end
 
