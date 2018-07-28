@@ -173,18 +173,21 @@ module Cani
 
           # meaty part, loop through browsers to create
           # the final feature table
-          browsers[0...viewable].each.with_index do |browser, x|
+          browsers.each.with_index do |browser, x|
             # some set up to find the current era for each browser
             # and creating a range around that to show past / coming support
             era_idx   = browser.most_popular_era_idx
             era_range = (era_idx - (ERAS / 2.0).floor + 1)..(era_idx + (ERAS / 2.0).ceil)
             bx        = offset_x + x * col_width + x
             by        = offset_y + cy
+            do_draw   = x < viewable
 
-            # draw browser names
-            Curses.setpos by, bx
-            Curses.attron color(:header) do
-              Curses.addstr browser.name.tr('_', '.').center(col_width)
+            if do_draw
+              # draw browser names
+              Curses.setpos by, bx
+              Curses.attron color(:header) do
+                Curses.addstr browser.name.tr('_', '.').center(col_width)
+              end
             end
 
             # accordingly increment current browser y for the table header (browser names)
@@ -204,9 +207,9 @@ module Cani
               note_nums  = feature.browser_note_nums.fetch(browser.name, {})
                                                     .fetch(era, [])
 
-              break if (ey + (is_current ? 1 : bot_pad) + 1) > height
+              break if (ey + (is_current ? 1 : bot_pad) + 1) >= height
 
-              if is_current
+              if do_draw && is_current
                 Curses.setpos ey - top_pad - 1, bx - 1
                 Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + 2) }
 
@@ -216,26 +219,30 @@ module Cani
 
               # only show visible / relevant browsers
               if browser.usage[era].to_i >= 0.5 || (!era.empty? && cur_era >= era_idx)
-                ((ey - top_pad)..(ey + (is_current ? 1 : bot_pad))).each do |ry|
-                  txt = (bot_pad.zero? && !is_current) ? (ry >= ey + (is_current ? 1 : bot_pad) ? era.to_s : ' ')
-                                      : (ry == ey ? era.to_s : ' ')
+                if do_draw
+                  ((ey - top_pad)..(ey + (is_current ? 1 : bot_pad))).each do |ry|
+                    txt = (bot_pad.zero? && !is_current) ? (ry >= ey + (is_current ? 1 : bot_pad) ? era.to_s : ' ')
+                                        : (ry == ey ? era.to_s : ' ')
 
-                  Curses.setpos ry, bx
-                  Curses.attron(colr) { Curses.addstr txt.center(col_width) }
+                    Curses.setpos ry, bx
+                    Curses.attron(colr) { Curses.addstr txt.center(col_width) }
 
-                  if is_current
-                    Curses.setpos ry, bx - 1
-                    Curses.attron(color(:era_border)) { Curses.addstr ' ' }
+                    if is_current
+                      Curses.setpos ry, bx - 1
+                      Curses.attron(color(:era_border)) { Curses.addstr ' ' }
 
-                    Curses.setpos ry, offset_x + table_width + 2
-                    Curses.attron(color(:era_border)) { Curses.addstr ' ' }
+                      Curses.setpos ry, offset_x + table_width + 2
+                      Curses.attron(color(:era_border)) { Curses.addstr ' ' }
+                    end
                   end
                 end
 
                 if note_nums.any?
                   notes_visible.concat(note_nums).uniq!
-                  Curses.setpos ey - top_pad, bx
-                  Curses.attron(note_color(supp_type)) { Curses.addstr ' ' + note_nums.join(' ') }
+                  if do_draw
+                    Curses.setpos ey - top_pad, bx
+                    Curses.attron(note_color(supp_type)) { Curses.addstr ' ' + note_nums.join(' ') }
+                  end
                 end
               end
             end
