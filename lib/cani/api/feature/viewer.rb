@@ -160,7 +160,16 @@ module Cani
             Curses.addstr status_format
           end
 
+          # 'more or less' predict a height that is too small
+          # since we don't know the entire height but draw it line-by-line at the moment
           compact_height = height <= 40
+
+          # by default, notes are only shown if visible in the actual table
+          # this means there might be more notes than actually displayed
+          # but this allows us to optimally use available space to display
+          # the most useful information to the user
+          # TODO: provide a config setting to disable this behaviour
+          notes_visible = []
 
           # meaty part, loop through browsers to create
           # the final feature table
@@ -222,6 +231,7 @@ module Cani
                 end
 
                 if note_nums.any?
+                  notes_visible.concat(note_nums).uniq!
                   Curses.setpos ey - top_pad, bx
                   Curses.attron(note_color(supp_type)) { Curses.addstr ' ' + note_nums.join(' ') }
                 end
@@ -269,7 +279,11 @@ module Cani
           cy += 1
 
           notes_chunked = feature.notes.map { |nt| nt.chars.each_slice(outer_width).map(&:join).map(&:strip) }
-          num_chunked   = feature.notes_by_num.each_with_object({}) { |(k, nt), h| h[k] = nt.chars.each_slice(outer_width - 5).map(&:join).map(&:strip) }
+          filter_vis    = Cani.config.notes == 'relevant' ? notes_visible.map(&:to_s) : feature.notes_by_num.keys
+
+          num_chunked   = feature.notes_by_num
+                            .select { |(k, _)| filter_vis.include? k }
+                            .each_with_object({}) { |(k, nt), h| h[k] = nt.chars.each_slice(outer_width - 5).map(&:join).map(&:strip) }
           notes_total   = (notes_chunked.map(&:size) + num_chunked.map(&:size)).reduce(0) { |total, add| total + add }
 
           if height > cy + 2 && (notes_chunked.any? || num_chunked.any?)
