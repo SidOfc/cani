@@ -55,8 +55,8 @@ module Cani
     puts 'cani is dependent on fzf (https://github.com/junegunn/fzf) for the interactive TUI to work.'.light_black
     puts 'without fzf, commands can still be piped to get the regular (colorless) output'.light_black
     puts ''
-    puts 'Cani requires at least 20 lines and 40 cols to work properly, this is not a hard limit but'
-    puts 'below this width, long lines could wrap a lot and reduce visible information.'
+    puts 'Cani requires at least 20 lines and 40 cols to work properly, this is not a hard limit but'.light_black
+    puts 'below this width, long lines could wrap a lot and reduce visible information.'.light_black
     puts ''
     puts 'Usage:'.red
     puts '   cani'.yellow + ' [COMMAND [ARGUMENTS]]'
