@@ -207,6 +207,7 @@ module Cani
               note_nums  = feature.browser_note_nums.fetch(browser.name, {})
                                                     .fetch(era, [])
 
+              # do not draw era's that exceed screen height
               break if (ey + (is_current ? 1 : bot_pad) + 1) >= height
 
               if do_draw && is_current
@@ -218,7 +219,7 @@ module Cani
               end
 
               # only show visible / relevant browsers
-              if browser.usage[era].to_i >= 0.5 || (!era.empty? && cur_era >= era_idx)
+              if browser.usage[era].to_i >= 0.5 || (!era.empty? && cur_era >= era_idx - 1)
                 if do_draw
                   ((ey - top_pad)..(ey + (is_current ? 1 : bot_pad))).each do |ry|
                     txt = (bot_pad.zero? && !is_current) ? (ry >= ey + (is_current ? 1 : bot_pad) ? era.to_s : ' ')
