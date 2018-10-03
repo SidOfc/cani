@@ -23,7 +23,7 @@ module Cani
 
     def self.executable?
       @exe ||= begin
-        `command -v fzf`
+        `command -v fzf;`.chomp
         $?.success?
       end
     end
