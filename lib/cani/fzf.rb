@@ -32,18 +32,20 @@ module Cani
         tt = format('%-24s', ft.title.size > 24 ? ft.title[0..23].strip + '..'
                                                 : ft.title)
 
-        [{content: "[#{ft.status}]", color: cl}, pc, tt, *ft.current_support]
+        [{content: "[#{ft.status}]", color: cl}, pc,
+         {content: tt, color: :default}, *ft.current_support]
       end
     end
 
     def self.browser_rows
       @browser_rows ||= Cani.api.browsers.map do |bwsr|
-        [bwsr.title, 'usage: ' + format('%.4f%%', bwsr.usage.values.reduce(0) { |total, add| total + add })]
+        [{content: bwsr.title, color: :default},
+         'usage: ' + format('%.4f%%', bwsr.usage.values.reduce(0) { |total, add| total + add })]
       end
     end
 
     def self.browser_usage_rows(brwsr)
-      brwsr.usage.map { |(v, u)| [v, 'usage: ' + format('%.4f%%', u)] }.reverse
+      brwsr.usage.map { |(v, u)| [{content: v, color: :default}, 'usage: ' + format('%.4f%%', u)] }.reverse
     end
 
     def self.browser_feature_rows(brwsr, version)
@@ -54,7 +56,7 @@ module Cani
           features.map do |feature|
             color = {'un' => :yellow, 'ot' => :magenta}.fetch feature[:status], :green
             [{content: "[#{feature[:status]}]", color: color},
-             "[#{type[:symbol]}]", feature[:title]]
+             "[#{type[:symbol]}]", {content: feature[:title], color: :default}]
           end
         end
       end.compact
