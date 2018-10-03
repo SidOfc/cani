@@ -22,10 +22,7 @@ module Cani
     end
 
     def self.executable?
-      @exe ||= begin
-        `command -v fzf;`.chomp
-        $?.success?
-      end
+      @exe ||= !system('fzf --version').nil?
     end
 
     def self.feature_rows
