@@ -207,6 +207,12 @@ cani show firefox 63 | head -3
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/sidofc/cani. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
+Special thanks to the following users and contributors:
+
+- [DamienRobert](https://github.com/DamienRobert)
+    - Enhance `fzf` executable [detection](https://github.com/SidOfc/cani/pull/3)
+    - Pointing out that some texts were [unreadable](https://github.com/SidOfc/cani/issues/2) on light background terminals ([pull](https://github.com/SidOfc/cani/pull/4)).
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
