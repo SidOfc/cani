@@ -1,4 +1,4 @@
-# Cani &mdash; a [caniuse.com](caniuse.com) tui interface ![Licence](https://img.shields.io/badge/license-MIT-E9573F.svg) [![Gem Version](https://img.shields.io/gem/v/cani.svg?colorB=E9573F&style=square)](rubygems.org/gems/cani) [![Issues](https://img.shields.io/github/issues/SidOfc/cani.svg)](https://github.com/SidOfc/cani/issues)
+# Cani &mdash; a [caniuse.com](caniuse.com) tui interface ![Licence](https://img.shields.io/badge/license-MIT-E9573F.svg) [![Gem Version](https://img.shields.io/gem/v/cani.svg?colorB=E9573F&style=square)](https://rubygems.org/gems/cani) [![Issues](https://img.shields.io/github/issues/SidOfc/cani.svg)](https://github.com/SidOfc/cani/issues)
 
 ![cani cli](/assets/cani.png)
 
