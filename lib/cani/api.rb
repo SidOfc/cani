@@ -62,6 +62,15 @@ module Cani
       features[idx] if idx
     end
 
+    def find_features(name)
+      name = Regexp.new name.to_s.downcase.gsub(/(\W)/, '.*'), :i
+      features.select do |ft|
+        ft.title.downcase.match(name) ||
+        ft.name.downcase.match(name)  ||
+        ft.description.downcase.match(name)
+      end
+    end
+
     def find_browser(name)
       name = name.to_s.downcase
       idx  = browsers.find_index do |bwsr|
