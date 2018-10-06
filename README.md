@@ -8,6 +8,14 @@ This wrapper aims to be easy to use out of the box. To achieve this it ships wit
 for `bash`, `fish`, and `zsh`. [Caniuse data (1.7MB)](https://github.com/Fyrd/caniuse/blob/master/data.json) is fetched and updated automatically
 on a regular interval together with completions.
 
+## Latest changes
+
+### 06-10-2018 VERSION 0.5.4
+
+- Fixed issue where `system` prints the version of fzf before running the command.
+- When multiple matches are found for a given query: `cani use shadow`, an fzf window will
+  now be opened with results filtered by the text `shadow` as initial query string.
+
 ## Installation
 
 Add this line to your application's Gemfile:
