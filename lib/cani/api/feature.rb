@@ -1,7 +1,7 @@
 module Cani
   class Api
     class Feature
-      attr_reader :title, :status, :spec, :stats, :percent, :name, :browser_note_nums, :notes, :notes_by_num
+      attr_reader :title, :status, :spec, :stats, :percent, :name, :browser_note_nums, :notes, :notes_by_num, :description
 
       STATUSES = {
         'rec'   => 'rc',
@@ -20,12 +20,13 @@ module Cani
       }.freeze
 
       def initialize(attributes = {})
-        @name    = attributes[:name].to_s.downcase
-        @title   = attributes['title']
-        @status  = STATUSES.fetch attributes['status'], attributes['status']
-        @spec    = attributes['spec']
-        @percent = attributes['usage_perc_y']
-        @notes   = attributes['notes'].split "\n"
+        @name         = attributes[:name].to_s.downcase
+        @title        = attributes['title']
+        @description  = attributes['description']
+        @status       = STATUSES.fetch attributes['status'], attributes['status']
+        @spec         = attributes['spec']
+        @percent      = attributes['usage_perc_y']
+        @notes        = attributes['notes'].split "\n"
         @notes_by_num = attributes['notes_by_num']
         @stats, @browser_note_nums = attributes['stats'].each_with_object([{}, {}]) do |(browser, info), (stts, notes)|
           stts[browser], notes[browser] = info.each_with_object([{}, {}]) do |(version, stat), (st, nt)|

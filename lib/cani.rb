@@ -115,21 +115,22 @@ module Cani
 
   def self.use(feature = nil)
     @use_min_depth ||= feature ? 1 : 0
+    can_go_back      = !(config.nav_type?('forward') && @use_min_depth > 0)
+    matches          = api.find_features feature
 
-    if feature && (feature = api.find_feature(feature))
+    return use if can_go_back && matches.empty?
+    return Api::Feature::Viewer.new(matches.first).render if matches.count == 1
+
+    chosen = Fzf.pick Fzf.feature_rows, query: feature,
+                          header: 'use]   [' + Api::Feature.support_legend,
+                          colors: %i[green light_black light_white light_black]
+
+    # chosen[2] is the title column of a row returned by Fzf.feature_rows
+    if chosen && chosen.any? && (feature = api.find_feature(chosen[2]))
       Api::Feature::Viewer.new(feature).render
-      use unless config.nav_type?('forward') && @use_min_depth > 0
-    elsif (chosen = Fzf.pick(Fzf.feature_rows,
-                             header: 'use]   [' + Api::Feature.support_legend,
-                             colors: %i[green light_black light_white light_black]))
-
-      # chosen[2] is the index of the title column from Fzf.feature_rows
-      if chosen.any? && (feature = api.find_feature(chosen[2]))
-        Api::Feature::Viewer.new(feature).render
-        use
-      else
-        exit
-      end
+      use
+    else
+      exit 0
     end
   end
 

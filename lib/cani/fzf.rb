@@ -9,10 +9,11 @@ module Cani
 
         rows   = tableize_rows(rows, **opts).join "\n"
         ohdr   = opts.fetch :header, []
+        query  = "--query=\"#{opts[:query]}\"" if opts[:query]
         header = ohdr.is_a?(Array) ? [:cani, *ohdr].map { |v| v.to_s.downcase }.join(':')
                                    : 'cani:' + ohdr.to_s
 
-        `echo "#{rows}" | fzf --ansi --header="[#{header}]"`.split '   '
+        `echo "#{rows}" | fzf --ansi --header="[#{header}]" #{query}`.split '   '
       else
         # when output of any initial command is being piped
         # print results and exit this command.
@@ -26,15 +27,17 @@ module Cani
     end
 
     def self.feature_rows
-      @feature_rows ||= Cani.api.features.map do |ft|
-        pc = format('%.2f%%', ft.percent).rjust 6
-        cl = {'un' => :yellow, 'ot' => :magenta}.fetch ft.status, :green
-        tt = format('%-24s', ft.title.size > 24 ? ft.title[0..23].strip + '..'
-                                                : ft.title)
+      @feature_rows ||= Cani.api.features.map(&Fzf.method(:to_feature_row))
+    end
 
-        [{content: "[#{ft.status}]", color: cl}, pc,
-         {content: tt, color: :default}, *ft.current_support]
-      end
+    def self.to_feature_row(ft)
+      pc = format('%.2f%%', ft.percent).rjust 6
+      cl = {'un' => :yellow, 'ot' => :magenta}.fetch ft.status, :green
+      tt = format('%-24s', ft.title.size > 24 ? ft.title[0..23].strip + '..'
+                                              : ft.title)
+
+      [{content: "[#{ft.status}]", color: cl}, pc,
+       {content: tt, color: :default}, *ft.current_support]
     end
 
     def self.browser_rows
