@@ -23,7 +23,7 @@ module Cani
     end
 
     def self.executable?
-      @exe ||= !system('fzf --version').nil?
+      @exe ||= system 'fzf --version > /dev/null 2>&1'
     end
 
     def self.feature_rows
