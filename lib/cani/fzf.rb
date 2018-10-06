@@ -9,10 +9,11 @@ module Cani
 
         rows   = tableize_rows(rows, **opts).join "\n"
         ohdr   = opts.fetch :header, []
+        query  = "--query=\"#{opts[:query]}\"" if opts[:query]
         header = ohdr.is_a?(Array) ? [:cani, *ohdr].map { |v| v.to_s.downcase }.join(':')
                                    : 'cani:' + ohdr.to_s
 
-        `echo "#{rows}" | fzf --ansi --header="[#{header}]"`.split '   '
+        `echo "#{rows}" | fzf --ansi --header="[#{header}]" #{query}`.split '   '
       else
         # when output of any initial command is being piped
         # print results and exit this command.
