@@ -52,6 +52,9 @@ Some existing files will also be modified:
 - `~/.bashrc` - A source line to bash completions will be added, or updated if it exists
 - `~/.zshrc` - A source line to zsh completions will be added, or updated if it exists
 
+**note:** This behavior can be permanently disabled at any time by adding the `--no-modify`
+[option](#options) at the end of the `cani` command.
+
 After running the command for the first time, please restart your shell or `source` your `~/.*rc` file to load completions.
 There are some commented settings that can be adjusted in the `~/.config/cani/config.yml` file.
 
@@ -68,6 +71,13 @@ Cani supports the following actions:
 - [`install_completions`](#install_completions) - install shell completions
 - [`purge`](#purge) - purge files and directories created by `cani`
 - [`edit`](#edit) - edit the default configuration file with `$EDITOR`
+
+## Options
+
+`cani` supports the following command line flags / options:
+
+- `--no-modify` - permanently disable automatic addition / deletion of shell config files.
+- `--modify` - permanently enable automatic addition / deletion of shell config files.
 
 ### use
 

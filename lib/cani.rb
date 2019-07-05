@@ -23,7 +23,10 @@ module Cani
     @settings ||= Config.new
   end
 
-  def self.exec!(command, *args)
+  def self.exec!(command, *args_and_options)
+    return config if command.start_with? '-'
+
+    args    = args_and_options.reject { |arg| arg.start_with? '-' }
     command = :help unless command && respond_to?(command)
     command = command.to_s.downcase.to_sym
 
@@ -74,6 +77,10 @@ module Cani
     puts '   '
     puts '   help                       '.blue      + 'show this help'.light_black
     puts '   version                    '.blue      + 'print the version number'.light_black
+    puts ''
+    puts 'Options:'.red
+    puts '   --[no-]modify              '.white + 'permanently enable/disable automatic adding/removing'.light_black
+    puts '                              '.white + 'of source lines in shell configuration files'.light_black
     puts ''
     puts 'Examples:'.red
     puts '   cani'.yellow + ' use'.blue

@@ -90,6 +90,8 @@ module Cani
     end
 
     def self.delete_source_lines!
+      return unless Cani.config.modify_shell_configs
+
       %w[bash zsh].each do |shell|
         shellrc = File.join Dir.home, ".#{shell}rc"
 
@@ -106,6 +108,8 @@ module Cani
     end
 
     def self.insert_source_lines!
+      return unless Cani.config.modify_shell_configs
+
       %w[bash zsh].each do |shell|
         shellrc = File.join Dir.home, ".#{shell}rc"
 
