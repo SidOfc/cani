@@ -23,7 +23,6 @@ module Cani
     @settings ||= Config.new
   end
 
-
   def self.exec!(command, *args)
     command = :help unless command && respond_to?(command)
     command = command.to_s.downcase.to_sym
@@ -52,14 +51,16 @@ module Cani
     puts 'in the \'use\' overview or calling \'use some-feature\' will display a'.light_black
     puts 'table as seen on caniuse.com using curses.'.light_black
     puts ''
-    puts 'cani is dependent on fzf (https://github.com/junegunn/fzf) for the interactive TUI to work.'.light_black
-    puts 'without fzf, commands can still be piped to get the regular (colorless) output.'.light_black
+    puts 'cani is dependent on fzf (https://github.com/junegunn/fzf)'.light_black
+    puts 'for the interactive TUI to work. Without fzf,'.light_black
+    puts 'commands can still be piped to get the regular (colorless) output.'.light_black
     puts ''
-    puts 'Cani requires at least 20 lines and 40 cols to work properly, this is not a hard limit but'.light_black
-    puts 'below this width, long lines could wrap a lot and significantly reduce visible information.'.light_black
+    puts 'Cani requires at least 20 lines and 40 cols to work properly,'.light_black
+    puts 'this is not a hard limit but below this width long lines could wrap'.light_black
+    puts 'a lot and significantly reduce visible information.'.light_black
     puts ''
     puts 'Usage:'.red
-    puts '   cani'.yellow + ' [COMMAND [ARGUMENTS]]'
+    puts '   cani'.yellow + ' [COMMAND [ARGUMENTS] [OPTIONS]]'
     puts ''
     puts 'Commands:'.red
     puts '   use '.blue + ' [FEATURE]             ' + 'show browser support for FEATURE'.light_black
@@ -96,7 +97,7 @@ module Cani
   end
 
   def self.install_completions
-    Completions.install!
+    Completions.install! || exit(1)
   end
 
   def self.purge
@@ -106,7 +107,7 @@ module Cani
   end
 
   def self.update
-    api.update! && Completions.install! || exit(1) unless api.updated?
+    api.update! && install_completions unless api.updated?
   end
 
   def self.edit

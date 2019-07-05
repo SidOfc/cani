@@ -7,14 +7,14 @@ module Cani
       shw = Cani.api.browsers.reduce String.new do |acc, browser|
         versions = browser.versions.reverse.join(' ')
         acc +
-        "\ncomplete -f -c cani -n '__fish_cani_using_command show' -a '#{browser.abbr}' -d '#{browser.label}'" +
-        "\ncomplete -f -c cani -n '__fish_cani_showing_browser #{browser.abbr}' -a '#{versions}'"
+          "\ncomplete -f -c cani -n '__fish_cani_using_command show' -a '#{browser.abbr}' -d '#{browser.label}'" +
+          "\ncomplete -f -c cani -n '__fish_cani_showing_browser #{browser.abbr}' -a '#{versions}'"
       end
 
       use = Cani.api.features.reduce String.new do |acc, feature|
         description = feature.title.size > 40 ? feature.title[0..28] + '..' : feature.title
         acc +
-        "\ncomplete -f -c cani -n '__fish_cani_using_command use' -a '#{feature.name}' -d '#{description}'"
+          "\ncomplete -f -c cani -n '__fish_cani_using_command use' -a '#{feature.name}' -d '#{description}'"
       end
 
       tpl + shw + "\n" + use
@@ -26,8 +26,8 @@ module Cani
       indent    = 10
       versions  = Cani.api.browsers.reduce String.new do |acc, browser|
         acc + (' ' * (indent - 2)) + browser.abbr + ")\n" +
-        (' ' * indent) + "_arguments -C \"1: :(#{browser.versions.join(' ')})\"\n" +
-        (' ' * indent) + ";;\n"
+          (' ' * indent) + "_arguments -C \"1: :(#{browser.versions.join(' ')})\"\n" +
+          (' ' * indent) + ";;\n"
       end.strip
 
       tpl.gsub('{{names}}', Cani.api.browsers.map(&:abbr).join(' '))
@@ -41,8 +41,8 @@ module Cani
       indent    = 10
       versions  = Cani.api.browsers.reduce String.new do |acc, browser|
         acc + (' ' * (indent - 2)) + '"' + browser.abbr + "\")\n" +
-        (' ' * indent) + "COMPREPLY=($(compgen -W \"#{browser.versions.join(' ')}\" ${COMP_WORDS[COMP_CWORD]}))\n" +
-        (' ' * indent) + ";;\n"
+          (' ' * indent) + "COMPREPLY=($(compgen -W \"#{browser.versions.join(' ')}\" ${COMP_WORDS[COMP_CWORD]}))\n" +
+          (' ' * indent) + ";;\n"
       end.strip
 
       tpl.gsub('{{names}}', Cani.api.browsers.map(&:abbr).join(' '))
