@@ -85,12 +85,20 @@ module Cani
       delete_source_lines!
     end
 
+    def self.compile_source_line(path)
+      "[ -f #{path} ] && source #{path}"
+    end
+
     def self.delete_source_lines!
       %w[bash zsh].each do |shell|
-        shellrc   = File.join Dir.home, ".#{shell}rc"
+        shellrc = File.join Dir.home, ".#{shell}rc"
+
+        next unless File.exist? shellrc
+
         lines     = File.read(shellrc).split "\n"
         comp_path = File.join Cani.config.comp_dir, "_cani.#{shell}"
-        rm_idx    = lines.find_index { |l| l.match comp_path }
+        comp_src  = compile_source_line(comp_path)
+        rm_idx    = lines.find_index { |l| l.match comp_src }
 
         lines.delete_at rm_idx unless rm_idx.nil?
         File.write shellrc, lines.join("\n")
@@ -99,17 +107,16 @@ module Cani
 
     def self.insert_source_lines!
       %w[bash zsh].each do |shell|
-        shellrc   = File.join Dir.home, ".#{shell}rc"
+        shellrc = File.join Dir.home, ".#{shell}rc"
+
+        next unless File.exist? shellrc
+
         lines     = File.read(shellrc).split "\n"
         comp_path = File.join Cani.config.comp_dir, "_cani.#{shell}"
-        slidx     = lines.find_index { |l| l.match comp_path }
+        comp_src  = compile_source_line comp_path
 
-        if slidx
-          lines[slidx] =
-            "#{lines[slidx][/^\s+/]}[ -f #{comp_path} ] && source #{comp_path}"
-        else
-          lines << "[ -f #{comp_path} ] && source #{comp_path}"
-        end
+        lines << comp_src \
+          unless lines.find_index { |l| l.match comp_src }
 
         File.write shellrc, lines.join("\n")
       end
