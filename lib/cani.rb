@@ -23,8 +23,10 @@ module Cani
     @settings ||= Config.new
   end
 
+  def self.exec!(command, *args_and_options)
+    return config if command.start_with? '-'
 
-  def self.exec!(command, *args)
+    args    = args_and_options.reject { |arg| arg.start_with? '-' }
     command = :help unless command && respond_to?(command)
     command = command.to_s.downcase.to_sym
 
@@ -35,7 +37,8 @@ module Cani
       use args[0]
     when :show
       show args[0], args[1]
-    when :update, :purge, :help, :version, :install_completions
+    when :update, :purge, :help, :version,
+         :install_completions, :completion_paths
       send command
     else
       help
@@ -52,20 +55,23 @@ module Cani
     puts 'in the \'use\' overview or calling \'use some-feature\' will display a'.light_black
     puts 'table as seen on caniuse.com using curses.'.light_black
     puts ''
-    puts 'cani is dependent on fzf (https://github.com/junegunn/fzf) for the interactive TUI to work.'.light_black
-    puts 'without fzf, commands can still be piped to get the regular (colorless) output.'.light_black
+    puts 'cani is dependent on fzf (https://github.com/junegunn/fzf)'.light_black
+    puts 'for the interactive TUI to work. Without fzf,'.light_black
+    puts 'commands can still be piped to get the regular (colorless) output.'.light_black
     puts ''
-    puts 'Cani requires at least 20 lines and 40 cols to work properly, this is not a hard limit but'.light_black
-    puts 'below this width, long lines could wrap a lot and significantly reduce visible information.'.light_black
+    puts 'Cani requires at least 20 lines and 40 cols to work properly,'.light_black
+    puts 'this is not a hard limit but below this width long lines could wrap'.light_black
+    puts 'a lot and significantly reduce visible information.'.light_black
     puts ''
     puts 'Usage:'.red
-    puts '   cani'.yellow + ' [COMMAND [ARGUMENTS]]'
+    puts '   cani'.yellow + ' [COMMAND [ARGUMENTS] [OPTIONS]]'
     puts ''
     puts 'Commands:'.red
     puts '   use '.blue + ' [FEATURE]             ' + 'show browser support for FEATURE'.light_black
     puts '   show'.blue + ' [BROWSER [VERSION]]   ' + 'show information about specific BROWSER and VERSION'.light_black
     puts '   '
     puts '   install_completions        '.blue      + 'installs completions for bash, zsh and fish'.light_black
+    puts '   completion_paths           '.blue      + 'prints completion paths that must be sourced in your shell configuration files'.light_black
     puts '   update                     '.blue      + 'force update api data and completions'.light_black
     puts '   edit                       '.blue      + 'edit configuration in $EDITOR'.light_black
     puts '   purge                      '.blue      + 'remove all completion, configuration and data'.light_black
@@ -73,6 +79,10 @@ module Cani
     puts '   '
     puts '   help                       '.blue      + 'show this help'.light_black
     puts '   version                    '.blue      + 'print the version number'.light_black
+    puts ''
+    puts 'Options:'.red
+    puts '   --[no-]modify              '.white + 'permanently enable/disable automatic adding/removing'.light_black
+    puts '                              '.white + 'of source lines in shell configuration files'.light_black
     puts ''
     puts 'Examples:'.red
     puts '   cani'.yellow + ' use'.blue
@@ -95,8 +105,12 @@ module Cani
     puts VERSION
   end
 
+  def self.completion_paths
+    Completions.paths
+  end
+
   def self.install_completions
-    Completions.install!
+    Completions.install! || exit(1)
   end
 
   def self.purge
@@ -106,7 +120,7 @@ module Cani
   end
 
   def self.update
-    api.update! && Completions.install! || exit(1) unless api.updated?
+    api.update! && install_completions unless api.updated?
   end
 
   def self.edit

@@ -1,13 +1,14 @@
 module Cani
   class Config
-    attr_reader :settings
+    attr_reader :settings, :modify_shell_configs
 
-    FILE          = File.join(Dir.home, '.config', 'cani', 'config.yml').freeze
-    DIRECTORY     = File.dirname(FILE).freeze
-    COMP_DIR      = File.join(DIRECTORY, 'completions').freeze
-    FISH_DIR      = File.join(Dir.home, '.config', 'fish').freeze
-    FISH_COMP_DIR = File.join(FISH_DIR, 'completions').freeze
-    DEFAULTS      = {
+    FILE           = File.join(Dir.home, '.config', 'cani', 'config.yml').freeze
+    DIRECTORY      = File.dirname(FILE).freeze
+    COMP_DIR       = File.join(DIRECTORY, 'completions').freeze
+    FISH_DIR       = File.join(Dir.home, '.config', 'fish').freeze
+    FISH_COMP_DIR  = File.join(FISH_DIR, 'completions').freeze
+    NO_MODIFY_FILE = File.join(DIRECTORY, '.no-modify-shellrc').freeze
+    DEFAULTS       = {
       # data settings
       'expire'   => 86_400,
       'source'   => 'https://raw.githubusercontent.com/Fyrd/caniuse/master/data.json',
@@ -20,7 +21,16 @@ module Cani
     }.freeze
 
     def initialize(**opts)
-      @settings = DEFAULTS.merge opts
+      no_modify_exists      = File.exist? NO_MODIFY_FILE
+      @settings             = DEFAULTS.merge opts
+      @modify_shell_configs =
+        if allow_shellrc_modification?
+          File.delete NO_MODIFY_FILE if no_modify_exists
+          true
+        elsif disallow_shellrc_modification?
+          FileUtils.touch NO_MODIFY_FILE unless no_modify_exists
+          false
+        end
 
       if File.exist? file
         if (yml = YAML.load_file(file))
@@ -29,6 +39,14 @@ module Cani
       else
         install!
       end
+    end
+
+    def disallow_shellrc_modification?
+      ARGV.include?('--no-modify') || File.exist?(NO_MODIFY_FILE)
+    end
+
+    def allow_shellrc_modification?
+      ARGV.include?('--modify') || !disallow_shellrc_modification?
     end
 
     def file
