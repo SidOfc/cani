@@ -13,7 +13,11 @@ module Cani
         header = ohdr.is_a?(Array) ? [:cani, *ohdr].map { |v| v.to_s.downcase }.join(':')
                                    : 'cani:' + ohdr.to_s
 
-        `echo "#{rows}" | fzf --ansi --header="[#{header}]" #{query}`.split '   '
+        IO.popen("fzf --ansi --header=\"[#{header}]\" #{query}", 'r+') do |io|
+          io.write rows
+          io.close_write
+          io.read
+        end.split '   '
       else
         # when output of any initial command is being piped
         # print results and exit this command.
