@@ -34,7 +34,7 @@ Or install it yourself as:
 
 **dependencies**
 
-Cani depends on [fzf](https://github.com/junegunn/fzf) to display most menu's.
+Cani depends on [fzf](https://github.com/junegunn/fzf) to display most menu's and Curses for displaying the feature support table.
 <!-- Fzf is not a requirement when piping the output to another command -->
 
 ## Configuration
@@ -47,13 +47,15 @@ After installation, running the command (`cani`) for the first time will create 
 - `~/.config/cani/completions/_cani.zsh` - zsh completion
 - `~/.config/fish/completions/cani.fish` - fish completions
 
-Some existing files will also be modified:
+**Existing shell configuration files will also be modified by default:**
 
 - `~/.bashrc` - A source line to bash completions will be added, or updated if it exists
 - `~/.zshrc` - A source line to zsh completions will be added, or updated if it exists
 
-**note:** This behavior can be permanently disabled at any time by adding the `--no-modify`
-[option](#options) at the end of the `cani` command.
+This behavior can be permanently disabled at any time by adding the `--no-modify`
+[option](#options) at the end of the `cani` command. A built-in command is provided to print
+the completion paths for each shell: [`cani completion_paths`](#completion_paths). This allows
+you to add the path manually.
 
 After running the command for the first time, please restart your shell or `source` your `~/.*rc` file to load completions.
 There are some commented settings that can be adjusted in the `~/.config/cani/config.yml` file.
@@ -69,6 +71,7 @@ Cani supports the following actions:
 - [`version`](#version) - print the version number
 - [`update`](#update) - force update data and completions
 - [`install_completions`](#install_completions) - install shell completions
+- [`completion_paths`](#completion_paths) - prints paths to shell completion files (for sourcing)
 - [`purge`](#purge) - purge files and directories created by `cani`
 - [`edit`](#edit) - edit the default configuration file with `$EDITOR`
 
@@ -166,6 +169,20 @@ cani install_completions
 Completions are supported for `zsh`, `bash` and `fish` shells (currently).
 They are automatically installed upon first invocation of the `cani` command.
 This command is only a fallback in case there were any issues with permissions etc..
+
+### completion_paths
+
+When `--no-modify` is applied the completion paths are no longer automatically inserted
+in your shell configuration files. In order to figure out where the files you need to
+source are located, you can run this command. It will output something like this:
+
+```plain
+fish: /home/sidofc/.config/fish/completions/cani.fish
+bash: /home/sidofc/.config/cani/completions/_cani.bash
+zsh:  /home/sidofc/.config/cani/completions/_cani.zsh
+```
+
+The fish completions are autoloaded and do not need to be sourced manually.
 
 ### purge
 

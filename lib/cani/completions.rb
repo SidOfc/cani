@@ -55,13 +55,8 @@ module Cani
       FileUtils.mkdir_p Cani.config.fish_comp_dir
       FileUtils.mkdir_p Cani.config.comp_dir
 
-      # write each completion file
-      File.open File.join(Cani.config.fish_comp_dir, 'cani.fish'), 'w' do |file|
-        file << generate_fish
-      end
-
-      %w[bash zsh].each do |shell|
-        File.open File.join(Cani.config.comp_dir, "_cani.#{shell}"), 'w' do |file|
+      %w[bash zsh fish].each do |shell|
+        File.open completion_path(shell), 'w' do |file|
           file << send("generate_#{shell}")
         end
       end
@@ -71,12 +66,8 @@ module Cani
     end
 
     def self.remove!
-      fish_comp = File.join Cani.config.fish_comp_dir, 'cani.fish'
-
-      File.unlink fish_comp if File.exist? fish_comp
-
-      %w[bash zsh].each do |shell|
-        shell_comp = File.join Cani.config.comp_dir, "_cani.#{shell}"
+      %w[bash zsh fish].each do |shell|
+        shell_comp = completion_path shell
 
         File.unlink shell_comp if File.exist? shell_comp
       end
@@ -85,7 +76,21 @@ module Cani
       delete_source_lines!
     end
 
+    def self.paths
+      puts "fish: #{completion_path(:fish)}"
+      puts "bash: #{completion_path(:bash)}"
+      puts "zsh:  #{completion_path(:zsh)}"
+    end
+
+    def self.completion_path(shell)
+      return File.join Cani.config.fish_comp_dir, 'cani.fish' if shell == :fish
+
+      File.join Cani.config.comp_dir, "_cani.#{shell}"
+    end
+
     def self.compile_source_line(path)
+      return "test -e #{path}; and source #{path}" if path.end_with? '.fish'
+
       "[ -f #{path} ] && source #{path}"
     end
 
@@ -98,8 +103,8 @@ module Cani
         next unless File.exist? shellrc
 
         lines     = File.read(shellrc).split "\n"
-        comp_path = File.join Cani.config.comp_dir, "_cani.#{shell}"
-        comp_src  = compile_source_line(comp_path)
+        comp_path = completion_path shell
+        comp_src  = compile_source_line comp_path
         rm_idx    = lines.find_index { |l| l.match comp_src }
 
         lines.delete_at rm_idx unless rm_idx.nil?
@@ -116,7 +121,7 @@ module Cani
         next unless File.exist? shellrc
 
         lines     = File.read(shellrc).split "\n"
-        comp_path = File.join Cani.config.comp_dir, "_cani.#{shell}"
+        comp_path = completion_path shell
         comp_src  = compile_source_line comp_path
 
         lines << comp_src \

@@ -37,7 +37,8 @@ module Cani
       use args[0]
     when :show
       show args[0], args[1]
-    when :update, :purge, :help, :version, :install_completions
+    when :update, :purge, :help, :version,
+         :install_completions, :completion_paths
       send command
     else
       help
@@ -70,6 +71,7 @@ module Cani
     puts '   show'.blue + ' [BROWSER [VERSION]]   ' + 'show information about specific BROWSER and VERSION'.light_black
     puts '   '
     puts '   install_completions        '.blue      + 'installs completions for bash, zsh and fish'.light_black
+    puts '   completion_paths           '.blue      + 'prints completion paths that must be sourced in your shell configuration files'.light_black
     puts '   update                     '.blue      + 'force update api data and completions'.light_black
     puts '   edit                       '.blue      + 'edit configuration in $EDITOR'.light_black
     puts '   purge                      '.blue      + 'remove all completion, configuration and data'.light_black
@@ -101,6 +103,10 @@ module Cani
 
   def self.version
     puts VERSION
+  end
+
+  def self.completion_paths
+    Completions.paths
   end
 
   def self.install_completions
