@@ -24,7 +24,7 @@ module Cani
   end
 
   def self.exec!(command, *args_and_options)
-    return config if command.start_with? '-'
+    return config if command&.start_with? '-'
 
     args    = args_and_options.reject { |arg| arg.start_with? '-' }
     command = :help unless command && respond_to?(command)
