@@ -227,9 +227,9 @@ Last but not least, all `cani` commands can be piped. This will skip running `fz
 **use** _(the output of_ `cani use ft-name` _cannot be piped)_
 ```sh
 cani use | head -3
-[rc]   97.11%   PNG alpha transparency       +chr   +ff   +edge   +ie   +saf   +saf.ios   +op   +and   +bb
-[un]   75.85%   Animated PNG (APNG)          +chr   +ff   -edge   -ie   +saf   +saf.ios   +op   -and   -bb
-[ls]   94.32%   Video element                +chr   +ff   +edge   +ie   +saf   +saf.ios   +op   +and   +bb
+[rc]   97.11%   PNG alpha transparency   +chr   +ff   +edge   +ie   +saf   +saf.ios   +op   +and   +bb
+[un]   75.85%   Animated PNG (APNG)      +chr   +ff   -edge   -ie   +saf   +saf.ios   +op   -and   -bb
+[ls]   94.32%   Video element            +chr   +ff   +edge   +ie   +saf   +saf.ios   +op   +and   +bb
 ```
 
 **show**
