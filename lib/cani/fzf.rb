@@ -31,7 +31,7 @@ module Cani
     end
 
     def self.dimensions
-      @dimensions ||= TTY::Screen.size
+      @dimensions ||= [TTY::Screen.columns, TTY::Screen.rows]
     end
 
     def self.longest_title_size
@@ -46,8 +46,8 @@ module Cani
       pc = format('%.2f%%', ft.percent).rjust 6
       cl = {'un' => :yellow, 'ot' => :magenta}.fetch ft.status, :green
 
-      total_len = ft.current_support.map(&:size).reduce(&:+) + pc.size + 4 + (ft.current_support.size + 2) * 3
-      rem_len   = [longest_title_size, 50, [dimensions.last - total_len, 30].max].min
+      total_len = ft.current_support.map(&:size).reduce(&:+) + pc.size + 6 + (ft.current_support.size + 2) * 3
+      rem_len   = [longest_title_size, 50, [dimensions.first - total_len, 24].max].min
 
       tt = format("%-#{rem_len}s", ft.title.size > rem_len ? ft.title[0...rem_len].strip + '..'
                                               : ft.title)
