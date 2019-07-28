@@ -44,10 +44,10 @@ module Cani
           brwsr = Cani.api.browsers[bridx] unless bridx.nil?
           syms  = stats[browser].values.compact.last(Cani.config.versions)
                                 .map { |s| TYPES[s][:symbol] || '' }
-                                .join.rjust Cani.config.versions
+                                .join
 
-          syms + brwsr.abbr
-        end
+          brwsr && syms + brwsr.abbr
+        end.compact
       end
 
       def support_in(browser, version)

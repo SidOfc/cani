@@ -6,6 +6,7 @@ require 'curses'
 require 'colorize'
 require 'json'
 require 'yaml'
+require 'tty-screen'
 
 require 'cani/api'
 require 'cani/fzf'

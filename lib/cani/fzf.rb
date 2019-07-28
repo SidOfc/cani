@@ -30,6 +30,14 @@ module Cani
       @exe ||= system 'fzf --version > /dev/null 2>&1'
     end
 
+    def self.dimensions
+      @dimensions ||= TTY::Screen.size
+    end
+
+    def self.longest_title_size
+      @longest_title_size ||= Cani.api.features.map(&:title).map(&:size).max
+    end
+
     def self.feature_rows
       @feature_rows ||= Cani.api.features.map(&Fzf.method(:to_feature_row))
     end
@@ -37,7 +45,11 @@ module Cani
     def self.to_feature_row(ft)
       pc = format('%.2f%%', ft.percent).rjust 6
       cl = {'un' => :yellow, 'ot' => :magenta}.fetch ft.status, :green
-      tt = format('%-24s', ft.title.size > 24 ? ft.title[0..23].strip + '..'
+
+      total_len = ft.current_support.map(&:size).reduce(&:+) + pc.size + 4 + (ft.current_support.size + 2) * 3
+      rem_len   = [longest_title_size, 50, [dimensions.last - total_len, 30].max].min
+
+      tt = format("%-#{rem_len}s", ft.title.size > rem_len ? ft.title[0...rem_len].strip + '..'
                                               : ft.title)
 
       [{content: "[#{ft.status}]", color: cl}, pc,
