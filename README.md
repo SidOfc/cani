@@ -10,6 +10,10 @@ on a regular interval together with completions.
 
 ## Latest changes
 
+### 28-07-2019 VERSION 0.5.7
+
+- Titles shown in `cani use` may take up to 50 characters if the terminal is wide enough.
+
 ### 24-07-2019 VERSION 0.5.6
 
 - Fix issue where `cani` would crash when used without arguments. Original behavior of showing `cani help` in that case is restored. ([#14](../../pull/14))
