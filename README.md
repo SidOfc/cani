@@ -10,6 +10,11 @@ on a regular interval together with completions.
 
 ## Latest changes
 
+### 28-07-2019 VERSION 0.5.8
+
+- Fix line overflow issue when terminal is too small for "widest" display
+- Allow titles to become slightly more compact again
+
 ### 28-07-2019 VERSION 0.5.7
 
 - Titles shown in `cani use` may take up to 50 characters if the terminal is wide enough.
