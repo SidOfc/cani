@@ -198,7 +198,7 @@ module Cani
 
             era_range.map do |cur_era|
               era = browser.eras[cur_era].to_s
-              browser.usage[era].to_i >= 0.5 || (!era.empty? && cur_era >= era_idx - 1)
+              browser.usage[era].to_f >= 0.5 || (!era.empty? && cur_era >= era_idx - 1)
             end.select { |x| x }.size
           end.max
 
@@ -248,7 +248,7 @@ module Cani
               # only show visible / relevant browsers
               # era's can either be empty or too new to determine
               # their usefulness by usage (when newer than current era).
-              if browser.usage[era].to_i >= 0.5 || (!era.empty? && cur_era >= era_idx - 1)
+              if browser.usage[era].to_f >= 0.5 || (!era.empty? && cur_era >= era_idx - 1)
                 ((ey - top_pad)..(ey + (is_current ? 1 : bot_pad))).each do |ry|
                   txt = (bot_pad.zero? && !is_current) ? (ry >= ey + (is_current ? 1 : bot_pad) ? era.to_s : ' ')
                                       : (ry == ey ? era.to_s : ' ')
