@@ -229,6 +229,7 @@ module Cani
               # do not draw era's that exceed screen height
               break if (ey + (is_current ? 1 : bot_pad) + 1) >= height
 
+              # draw current era outline before drawing all era cells on top
               if do_draw && is_current
                 Curses.setpos ey - top_pad - 1, [bx - 1, 0].max
                 Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + 2) }
@@ -238,6 +239,8 @@ module Cani
               end
 
               # only show visible / relevant browsers
+              # era's can either be empty or too new to determine
+              # their usefulness by usage (when newer than current era).
               if browser.usage[era].to_i >= 0.5 || (!era.empty? && cur_era >= era_idx - 1)
                 if do_draw
                   ((ey - top_pad)..(ey + (is_current ? 1 : bot_pad))).each do |ry|
@@ -247,6 +250,7 @@ module Cani
                     Curses.setpos ry, bx
                     Curses.attron(colr) { Curses.addstr txt.center(col_width) }
 
+                    # draw current ara border inbetween the cells
                     if is_current
                       Curses.setpos ry, bx - 1
                       Curses.attron(color(:era_border)) { Curses.addstr ' ' }
@@ -291,6 +295,7 @@ module Cani
           # showing which label belongs to which color
           if height > cy + 1
             Feature::TYPES.values.each_slice viewable do |group|
+              # draw legend texts at proper position
               group.compact.each.with_index do |type, lx|
                 Curses.setpos offset_y + cy, offset_x + lx * col_width + lx
                 Curses.attron color(type[:name], :fg) do
@@ -327,6 +332,7 @@ module Cani
           # and one empty line below it
           cy += 2
 
+          # print global notes, wrapped on terminal width
           notes_chunked.each do |chunks|
             break if cy + 1 + chunks.size > height
 
@@ -339,6 +345,7 @@ module Cani
             cy += 1
           end
 
+          # print numbered notes, wrapped on terminal width
           num_chunked.each do |num, chunks|
             break if cy + 1 + chunks.size > height
 
