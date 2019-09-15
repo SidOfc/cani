@@ -192,21 +192,28 @@ module Cani
 
           # meaty part, loop through browsers to create
           # the final feature table
-          browsers.each.with_index do |browser, x|
+          relevant_era_count = browsers[0...viewable].map do |browser|
+            era_idx   = browser.most_popular_era_idx
+            era_range = (era_idx - (ERAS / 2.0).floor + 1)..(era_idx + (ERAS / 2.0).ceil)
+
+            era_range.map do |cur_era|
+              era = browser.eras[cur_era].to_s
+              browser.usage[era].to_i >= 0.5 || (!era.empty? && cur_era >= era_idx - 1)
+            end.select { |x| x }.size
+          end.max
+
+          browsers[0...viewable].each.with_index do |browser, x|
             # some set up to find the current era for each browser
             # and creating a range around that to show past / coming support
             era_idx   = browser.most_popular_era_idx
-            era_range = (era_idx - (ERAS / 2.0).floor + 1)..(era_idx + (ERAS / 2.0).ceil)
+            era_range = (era_idx - (relevant_era_count / 2.0).floor + 1)..(era_idx + (relevant_era_count / 2.0).ceil)
             bx        = offset_x + x * col_width + x
             by        = offset_y + cy
-            do_draw   = x < viewable
 
-            if do_draw
-              # draw browser names
-              Curses.setpos by, bx
-              Curses.attron color(:header) do
-                Curses.addstr browser.name.tr('_', '.').center(col_width)
-              end
+            # draw browser names
+            Curses.setpos by, bx
+            Curses.attron color(:header) do
+              Curses.addstr browser.name.tr('_', '.').center(col_width)
             end
 
             # accordingly increment current browser y for the table header (browser names)
@@ -230,7 +237,7 @@ module Cani
               break if (ey + (is_current ? 1 : bot_pad) + 1) >= height
 
               # draw current era outline before drawing all era cells on top
-              if do_draw && is_current
+              if is_current
                 Curses.setpos ey - top_pad - 1, [bx - 1, 0].max
                 Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + 2) }
 
@@ -242,31 +249,27 @@ module Cani
               # era's can either be empty or too new to determine
               # their usefulness by usage (when newer than current era).
               if browser.usage[era].to_i >= 0.5 || (!era.empty? && cur_era >= era_idx - 1)
-                if do_draw
-                  ((ey - top_pad)..(ey + (is_current ? 1 : bot_pad))).each do |ry|
-                    txt = (bot_pad.zero? && !is_current) ? (ry >= ey + (is_current ? 1 : bot_pad) ? era.to_s : ' ')
-                                        : (ry == ey ? era.to_s : ' ')
+                ((ey - top_pad)..(ey + (is_current ? 1 : bot_pad))).each do |ry|
+                  txt = (bot_pad.zero? && !is_current) ? (ry >= ey + (is_current ? 1 : bot_pad) ? era.to_s : ' ')
+                                      : (ry == ey ? era.to_s : ' ')
 
-                    Curses.setpos ry, bx
-                    Curses.attron(colr) { Curses.addstr txt.center(col_width) }
+                  Curses.setpos ry, bx
+                  Curses.attron(colr) { Curses.addstr txt.center(col_width) }
 
-                    # draw current ara border inbetween the cells
-                    if is_current
-                      Curses.setpos ry, bx - 1
-                      Curses.attron(color(:era_border)) { Curses.addstr ' ' }
+                  # draw current ara border inbetween the cells
+                  if is_current
+                    Curses.setpos ry, bx - 1
+                    Curses.attron(color(:era_border)) { Curses.addstr ' ' }
 
-                      Curses.setpos ry, offset_x + table_width + 2
-                      Curses.attron(color(:era_border)) { Curses.addstr ' ' }
-                    end
+                    Curses.setpos ry, offset_x + table_width + 2
+                    Curses.attron(color(:era_border)) { Curses.addstr ' ' }
                   end
                 end
 
                 if note_nums.any?
                   notes_visible.concat(note_nums).uniq!
-                  if do_draw
-                    Curses.setpos ey - top_pad, bx
-                    Curses.attron(note_color(supp_type)) { Curses.addstr ' ' + note_nums.join(' ') }
-                  end
+                  Curses.setpos ey - top_pad, bx
+                  Curses.attron(note_color(supp_type)) { Curses.addstr ' ' + note_nums.join(' ') }
                 end
               end
             end
@@ -276,7 +279,7 @@ module Cani
           # plus the 4 lines around the current era
           # plus the 1 line of browser names
           # plus the 2 blank lines above and below the eras
-          cy += (ERAS - 1) * (compact_height ? 3 : 4) + ERAS
+          cy += (relevant_era_count - 1) * (compact_height ? 3 : 4) + relevant_era_count + (relevant_era_count % 2 == 0 ? 0 : 1)
 
           if height > cy + 3
             # print legend header
@@ -395,9 +398,7 @@ module Cani
           @height, @width = IO.console.winsize
           @viewable       = browsers.size
 
-          while tablew >= @width
-            @viewable -= 1
-          end
+          @viewable -= 1 while tablew >= @width
 
           @col_width   = [colw, Feature::TYPES.map { |(_, h)| h[:short].size }.max + 3].max
           @table_width = tablew - 2 # vertical padding at start and end of current era line
