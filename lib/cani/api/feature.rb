@@ -4,19 +4,19 @@ module Cani
       attr_reader :title, :status, :spec, :stats, :percent, :name, :browser_note_nums, :notes, :notes_by_num, :description
 
       STATUSES = {
-        'rec'   => 'rc',
+        'rec' => 'rc',
         'unoff' => 'un',
         'other' => 'ot'
       }.freeze
 
       TYPES = {
-        'y' => {symbol: '+', name: :default,     short: :sup},
-        'a' => {symbol: '~', name: :partial,     short: :prt},
-        'n' => {symbol: '-', name: :unsupported, short: :not},
-        'p' => {symbol: '#', name: :polyfill,    short: :ply},
-        'x' => {symbol: '@', name: :prefix,      short: :pfx},
-        'd' => {symbol: '!', name: :flag,        short: :flg},
-        'u' => {symbol: '?', name: :unknown,     short: :unk}
+        'y' => { symbol: '+', name: :default,     short: :sup },
+        'a' => { symbol: '~', name: :partial,     short: :prt },
+        'n' => { symbol: '-', name: :unsupported, short: :not },
+        'p' => { symbol: '#', name: :polyfill,    short: :ply },
+        'x' => { symbol: '@', name: :prefix,      short: :pfx },
+        'd' => { symbol: '!', name: :flag,        short: :flg },
+        'u' => { symbol: '?', name: :unknown,     short: :unk }
       }.freeze
 
       def initialize(attributes = {})

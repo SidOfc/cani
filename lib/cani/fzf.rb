@@ -44,7 +44,7 @@ module Cani
 
     def self.to_feature_row(ft)
       pc = format('%.2f%%', ft.percent).rjust 6
-      cl = {'un' => :yellow, 'ot' => :magenta}.fetch ft.status, :green
+      cl = { 'un' => :yellow, 'ot' => :magenta }.fetch ft.status, :green
 
       total_len = ft.current_support.map(&:size).reduce(&:+) + pc.size + 6 + (ft.current_support.size + 2) * 3
       rem_len   = [longest_title_size, 50, [dimensions.first - total_len, 24].max].min
@@ -52,19 +52,19 @@ module Cani
       tt = format("%-#{rem_len}s", ft.title.size > rem_len ? ft.title[0...rem_len].strip + '..'
                                               : ft.title)
 
-      [{content: "[#{ft.status}]", color: cl}, pc,
-       {content: tt, color: :default}, *ft.current_support]
+      [{ content: "[#{ft.status}]", color: cl }, pc,
+       { content: tt, color: :default }, *ft.current_support]
     end
 
     def self.browser_rows
       @browser_rows ||= Cani.api.browsers.map do |bwsr|
-        [{content: bwsr.title, color: :default},
+        [{ content: bwsr.title, color: :default },
          'usage: ' + format('%.4f%%', bwsr.usage.values.reduce(0) { |total, add| total + add })]
       end
     end
 
     def self.browser_usage_rows(brwsr)
-      brwsr.usage.map { |(v, u)| [{content: v, color: :default}, 'usage: ' + format('%.4f%%', u)] }.reverse
+      brwsr.usage.map { |(v, u)| [{ content: v, color: :default }, 'usage: ' + format('%.4f%%', u)] }.reverse
     end
 
     def self.browser_feature_rows(brwsr, version)
@@ -73,9 +73,9 @@ module Cani
       Api::Feature::TYPES.flat_map do |(status, type)|
         if (features = features_by_support.fetch(type[:name], nil))
           features.map do |feature|
-            color = {'un' => :yellow, 'ot' => :magenta}.fetch feature[:status], :green
-            [{content: "[#{feature[:status]}]", color: color},
-             "[#{type[:symbol]}]", {content: feature[:title], color: :default}]
+            color = { 'un' => :yellow, 'ot' => :magenta }.fetch feature[:status], :green
+            [{ content: "[#{feature[:status]}]", color: color },
+             "[#{type[:symbol]}]", { content: feature[:title], color: :default }]
           end
         end
       end.compact

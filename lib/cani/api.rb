@@ -66,8 +66,8 @@ module Cani
       name = Regexp.new name.to_s.downcase.gsub(/(\W)/, '.*'), :i
       features.select do |ft|
         ft.title.downcase.match(name) ||
-        ft.name.downcase.match(name)  ||
-        ft.description.downcase.match(name)
+          ft.name.downcase.match(name) ||
+          ft.description.downcase.match(name)
       end
     end
 

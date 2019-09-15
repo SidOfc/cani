@@ -2,33 +2,47 @@ module Cani
   class Api
     class Feature
       class Viewer
-        attr_reader :width, :height, :feature, :browsers, :viewable, :col_width, :table_width
+        attr_reader :width, :height, :feature, :browsers, :viewable,
+                    :col_width, :table_width
 
         COLOR_PAIRS = {
           # foreground colors
-          69  => [70,  -1], # green on default   (legend supported, feature status, percentage counter)
-          213 => [208, -1], # orange on default  (legend partial, percentage counter)
-          195 => [160, -1], # red on default     (legend unsupported, percentage counter)
-          133 => [134, -1], # magenta on default (legend flag, current feature status)
-          12  => [75,  -1], # blue on default    (legend prefix)
+
+          # green on default
+          # (legend supported, feature status, percentage counter)
+          69 => [70,  -1],
+
+          # orange on default
+          # (legend partial, percentage counter)
+          213 => [208, -1],
+
+          # red on default
+          # (legend unsupported, percentage counter)
+          195 => [160, -1],
+
+          # magenta on default
+          # (legend flag, current feature status)
+          133 => [134, -1],
+
+          12 => [75, -1], # blue on default    (legend prefix)
           204 => [205, -1], # pink on default    (legend polyfill)
-          99  => [239, -1], # gray on default    (legend unknown)
+          99 => [239, -1], # gray on default    (legend unknown)
 
           # note background + foreground colors
-          71  => [22,   70], # dark green on green     (supported feature)
+          71 => [22, 70], # dark green on green     (supported feature)
           209 => [130, 208], # dark orange on orange   (partial feature)
           197 => [88,  160], # dark red on red         (unsupported feature)
           135 => [91,  134], # dark magenta on magenta (flag features)
-          13  => [27,   75], # dark blue on blue       (prefix feature)
+          13 => [27, 75], # dark blue on blue       (prefix feature)
           101 => [235, 239], # dark gray on gray       (unknown features)
           206 => [127, 205], # dark pink on pink       (polyfill features)
 
           # background colors
-          70  => [7,  70], # white on green      (supported feature)
+          70 => [7, 70], # white on green      (supported feature)
           208 => [7, 208], # white on orange     (partial feature)
           196 => [7, 160], # white on red        (unsupported feature)
           134 => [7, 134], # white on magenta    (flag features)
-          11  => [7,  75], # white on blue       (prefix feature)
+          11 => [7, 75], # white on blue       (prefix feature)
           100 => [7, 239], # white on gray       (unknown features)
           205 => [7, 205], # white on pink       (polyfill features)
 
@@ -39,39 +53,42 @@ module Cani
 
         COLORS = {
           # table headers
-          header:      {fg: Curses.color_pair(254), bg: Curses.color_pair(254)},
+          header: { fg: Curses.color_pair(254), bg: Curses.color_pair(254) },
 
           # current era border
-          era_border:  {fg: Curses.color_pair(239), bg: Curses.color_pair(239)},
+          era_border: { fg: Curses.color_pair(239),
+                        bg: Curses.color_pair(239) },
 
           # support types
-          default:     {fg: Curses.color_pair(69),  bg: Curses.color_pair(70)},
-          partial:     {fg: Curses.color_pair(213), bg: Curses.color_pair(208)},
-          prefix:      {fg: Curses.color_pair(12),  bg: Curses.color_pair(11)},
-          polyfill:    {fg: Curses.color_pair(204), bg: Curses.color_pair(205)},
-          flag:        {fg: Curses.color_pair(133), bg: Curses.color_pair(134)},
-          unsupported: {fg: Curses.color_pair(195), bg: Curses.color_pair(196)},
-          unknown:     {fg: Curses.color_pair(99),  bg: Curses.color_pair(100)},
+          default: { fg: Curses.color_pair(69),  bg: Curses.color_pair(70) },
+          partial: { fg: Curses.color_pair(213), bg: Curses.color_pair(208) },
+          prefix: { fg: Curses.color_pair(12), bg: Curses.color_pair(11) },
+          polyfill: { fg: Curses.color_pair(204), bg: Curses.color_pair(205) },
+          flag: { fg: Curses.color_pair(133), bg: Curses.color_pair(134) },
+          unknown: { fg: Curses.color_pair(99), bg: Curses.color_pair(100) },
+          unsupported: { fg: Curses.color_pair(195),
+                         bg: Curses.color_pair(196) },
 
           # statuses
-          un:          {fg: Curses.color_pair(213), bg: Curses.color_pair(208)},
-          ot:          {fg: Curses.color_pair(133), bg: Curses.color_pair(134)}
+          un: { fg: Curses.color_pair(213), bg: Curses.color_pair(208) },
+          ot: { fg: Curses.color_pair(133), bg: Curses.color_pair(134) }
         }.freeze
 
         NOTE_COLORS = {
-          default:     {fg: Curses.color_pair(71),  bg: Curses.color_pair(70)},
-          partial:     {fg: Curses.color_pair(209), bg: Curses.color_pair(208)},
-          prefix:      {fg: Curses.color_pair(13),  bg: Curses.color_pair(11)},
-          polyfill:    {fg: Curses.color_pair(206), bg: Curses.color_pair(205)},
-          flag:        {fg: Curses.color_pair(135), bg: Curses.color_pair(134)},
-          unsupported: {fg: Curses.color_pair(197), bg: Curses.color_pair(196)},
-          unknown:     {fg: Curses.color_pair(101), bg: Curses.color_pair(100)},
-        }
+          default: { fg: Curses.color_pair(71),  bg: Curses.color_pair(70) },
+          partial: { fg: Curses.color_pair(209), bg: Curses.color_pair(208) },
+          prefix: { fg: Curses.color_pair(13), bg: Curses.color_pair(11) },
+          polyfill: { fg: Curses.color_pair(206), bg: Curses.color_pair(205) },
+          flag: { fg: Curses.color_pair(135), bg: Curses.color_pair(134) },
+          unknown: { fg: Curses.color_pair(101), bg: Curses.color_pair(100) },
+          unsupported: { fg: Curses.color_pair(197),
+                         bg: Curses.color_pair(196) }
+        }.freeze
 
         PERCENT_COLORS = {
-          70..101 => {fg: Curses.color_pair(69),  bg: Curses.color_pair(70)},
-          40..70  => {fg: Curses.color_pair(213), bg: Curses.color_pair(208)},
-          0..40   => {fg: Curses.color_pair(195), bg: Curses.color_pair(196)}
+          70..101 => { fg: Curses.color_pair(69), bg: Curses.color_pair(70) },
+          40..70 => { fg: Curses.color_pair(213), bg: Curses.color_pair(208) },
+          0..40 => { fg: Curses.color_pair(195), bg: Curses.color_pair(196) }
         }.freeze
 
         ERAS    = 6  # range of eras to show around current era (incl current)
@@ -103,7 +120,7 @@ module Cani
           at_exit(&method(:close))
         end
 
-        def close(*args)
+        def close(*_args)
           Curses.close_screen
         end
 
@@ -149,7 +166,8 @@ module Cani
           end
 
           # status positioning and drawing
-          # when compact? draw it on the second line instead of the first line at the end of the title
+          # when compact? draw it on the second line instead of the
+          # first line at the end of the title
           cy       += 1
           status_yp = offset_y + (compact? ? 1 : 0)
           status_xp = offset_x + (compact? ? table_width - status_format.size
@@ -161,7 +179,8 @@ module Cani
           end
 
           # 'more or less' predict a height that is too small
-          # since we don't know the entire height but draw it line-by-line at the moment
+          # since we don't know the entire height but draw
+          # it line-by-line at the moment
           compact_height = height <= 40
 
           # by default, notes are only shown if visible in the actual table
@@ -205,16 +224,16 @@ module Cani
               bot_pad    = compact_height ? 0 : 1
               ey         = by + (y * (2 + top_pad + bot_pad)) + (bot_pad.zero? && past_curr ? 1 : 0)
               note_nums  = feature.browser_note_nums.fetch(browser.name, {})
-                                                    .fetch(era, [])
+                                  .fetch(era, [])
 
               # do not draw era's that exceed screen height
               break if (ey + (is_current ? 1 : bot_pad) + 1) >= height
 
               if do_draw && is_current
-                Curses.setpos ey - top_pad - 1, bx - 1
+                Curses.setpos ey - top_pad - 1, [bx - 1, 0].max
                 Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + 2) }
 
-                Curses.setpos ey + (is_current ? 1 : bot_pad) + 1, bx - 1
+                Curses.setpos ey + (is_current ? 1 : bot_pad) + 1, [bx - 1, 0].max
                 Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + 2) }
               end
 
@@ -292,8 +311,8 @@ module Cani
           filter_vis    = Cani.config.notes == 'relevant' ? notes_visible.map(&:to_s) : feature.notes_by_num.keys
 
           num_chunked   = feature.notes_by_num
-                            .select { |(k, _)| filter_vis.include? k }
-                            .each_with_object({}) { |(k, nt), h| h[k] = nt.chars.each_slice(outer_width - 5).map(&:join).map(&:strip) }
+                                 .select { |(k, _)| filter_vis.include? k }
+                                 .each_with_object({}) { |(k, nt), h| h[k] = nt.chars.each_slice(outer_width - 5).map(&:join).map(&:strip) }
           notes_total   = (notes_chunked.map(&:size) + num_chunked.map(&:size)).reduce(0) { |total, add| total + add }
 
           if height > cy + 2 && (notes_chunked.any? || num_chunked.any?)
@@ -310,6 +329,7 @@ module Cani
 
           notes_chunked.each do |chunks|
             break if cy + 1 + chunks.size > height
+
             chunks.each do |part|
               Curses.setpos offset_y + cy, offset_x
               Curses.addstr part
@@ -321,6 +341,7 @@ module Cani
 
           num_chunked.each do |num, chunks|
             break if cy + 1 + chunks.size > height
+
             Curses.setpos offset_y + cy, offset_x
             Curses.attron color(:header) do
               Curses.addstr num.center(3)
@@ -367,7 +388,7 @@ module Cani
           @height, @width = IO.console.winsize
           @viewable       = browsers.size
 
-          while tablew > @width
+          while tablew >= @width
             @viewable -= 1
           end
 

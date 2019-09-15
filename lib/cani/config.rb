@@ -10,14 +10,14 @@ module Cani
     NO_MODIFY_FILE = File.join(DIRECTORY, '.no-modify-shellrc').freeze
     DEFAULTS       = {
       # data settings
-      'expire'   => 86_400,
-      'source'   => 'https://raw.githubusercontent.com/Fyrd/caniuse/master/data.json',
+      'expire' => 86_400,
+      'source' => 'https://raw.githubusercontent.com/Fyrd/caniuse/master/data.json',
 
       # usage settings
       'versions' => 1,
       'browsers' => %w[ie edge chrome firefox safari ios_saf opera android bb],
       'navigate' => 'always',
-      'notes'    => 'relevant'
+      'notes' => 'relevant'
     }.freeze
 
     def initialize(**opts)

@@ -5,24 +5,24 @@ module Cani
 
       ABBR_MAP  = { 'ios' => 'saf.ios' }.freeze
       LABEL_MAP = {
-        'ie'      => 'Internet Explorer',
-        'edge'    => 'Edge',
-        'ff'      => 'Firefox',
-        'chr'     => 'Chrome',
-        'saf'     => 'Safari',
-        'op'      => 'Opera',
+        'ie' => 'Internet Explorer',
+        'edge' => 'Edge',
+        'ff' => 'Firefox',
+        'chr' => 'Chrome',
+        'saf' => 'Safari',
+        'op' => 'Opera',
         'saf.ios' => 'IOS Safari',
-        'o.mini'  => 'Opera Mini',
-        'and'     => 'Android Browser',
-        'bb'      => 'BlackBerry Browser',
-        'o.mob'   => 'Opera Mobile',
+        'o.mini' => 'Opera Mini',
+        'and' => 'Android Browser',
+        'bb' => 'BlackBerry Browser',
+        'o.mob' => 'Opera Mobile',
         'chr.and' => 'Chrome for Android',
-        'ff.and'  => 'Firefox for Android',
-        'ie.mob'  => 'Internet Explorer Mobile',
-        'uc'      => 'UC Browser for android',
-        'ss'      => 'Samsung Internet',
-        'qq'      => 'QQ Browser',
-        'baidu'   => 'Baidu Browser'
+        'ff.and' => 'Firefox for Android',
+        'ie.mob' => 'Internet Explorer Mobile',
+        'uc' => 'UC Browser for android',
+        'ss' => 'Samsung Internet',
+        'qq' => 'QQ Browser',
+        'baidu' => 'Baidu Browser'
       }.freeze
 
       def initialize(attributes = {})
