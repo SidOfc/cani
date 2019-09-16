@@ -201,7 +201,7 @@ cani purge
 ```
 
 Purges all files created by this command, removing every trace except the executable itself.
-It will also remove source lines added that pointed to the completions in `~/.zshrc` and `~/.bashrc`.
+It will also remove source lines added that pointed to the completions in `~/.zshrc` and `~/.bashrc` (unless `--no-modify` was supplied at any point in time prior to running `purge`).
 After running a `purge`, all that remains is running `gem uninstall cani` to completely purge it.
 
 ### edit
