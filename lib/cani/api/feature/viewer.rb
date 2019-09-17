@@ -127,7 +127,7 @@ module Cani
         def draw
           Curses.clear
 
-          outer_width   = table_width + 2
+          outer_width   = tablew
           percent_num   = format '%.2f%%', feature.percent
           status_format = "[#{feature.status}]"
           percent_label = compact? ? '' : 'support: '
@@ -238,11 +238,13 @@ module Cani
 
               # draw current era outline before drawing all era cells on top
               if is_current
+                rcwo = (width - tablew).positive? ? 2 : 1
+
                 Curses.setpos ey - top_pad - 1, [bx - 1, 0].max
-                Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + 2) }
+                Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + rcwo) }
 
                 Curses.setpos ey + (is_current ? 1 : bot_pad) + 1, [bx - 1, 0].max
-                Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + 2) }
+                Curses.attron(color(:era_border)) { Curses.addstr ' ' * (col_width + rcwo) }
               end
 
               # only show visible / relevant browsers
@@ -261,8 +263,10 @@ module Cani
                     Curses.setpos ry, bx - 1
                     Curses.attron(color(:era_border)) { Curses.addstr ' ' }
 
-                    Curses.setpos ry, offset_x + table_width + 2
-                    Curses.attron(color(:era_border)) { Curses.addstr ' ' }
+                    if (width - tablew).positive?
+                      Curses.setpos ry, offset_x + table_width + 2
+                      Curses.attron(color(:era_border)) { Curses.addstr ' ' }
+                    end
                   end
                 end
 
@@ -398,7 +402,7 @@ module Cani
           @height, @width = IO.console.winsize
           @viewable       = browsers.size
 
-          @viewable -= 1 while tablew >= @width
+          @viewable -= 1 while tablew > @width
 
           @col_width   = [colw, Feature::TYPES.map { |(_, h)| h[:short].size }.max + 3].max
           @table_width = tablew - 2 # vertical padding at start and end of current era line
